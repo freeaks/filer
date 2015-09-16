@@ -1,4 +1,2 @@
-attempt at writing a file manager in pygtk for amiwm
+attempt at writing a file manager in pygtk/pyqt
 
-
-![rzzz](https://github.com/freeaks/filer/blob/master/filer_screen.png "screenshot")
