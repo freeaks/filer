@@ -11,7 +11,9 @@
 from PyQt5.QtGui import * 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-import sys
+import sys, os
+from os import listdir
+from os.path import isfile,isdir, join
 
 
 class DragWidget(QFrame):
@@ -105,6 +107,9 @@ class DragWidget(QFrame):
             child.setPixmap(pixmap)
 
 
+
+
+
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
@@ -114,6 +119,18 @@ if __name__ == '__main__':
     mainWidget = QWidget()
     mainWidget.setPalette(palette)
     horizontalLayout = QHBoxLayout()
+    
+    path = "./"
+    for name in os.listdir(path):
+        if os.path.isfile(os.path.join(path, name)):
+            print("file = ",name)
+            #DragImage('file.png',layout, path, name)
+        if os.path.isdir(os.path.join(path, name)):
+            print ("dire =", name)
+            #DragImage('directory.png',layout, path, name)
+
+    
+    
     horizontalLayout.addWidget(DragWidget())
     mainWidget.setLayout(horizontalLayout)
     mainWidget.setWindowTitle("Draggable Icons")
