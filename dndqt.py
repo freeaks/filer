@@ -1,19 +1,13 @@
 #!/usr/bin/python3
 
-#~ from PyQt5.QtCore import (QByteArray, QDataStream, QIODevice, QMimeData,
-        #~ QPoint, Qt)
-#~ from PyQt5.QtGui import QColor, QDrag, QPainter, QPixmap
-#~ from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QWidget
-
-#import draggableicons_rc
-
-
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-import sys, os
+import sys
+import os
 from os import listdir
 from os.path import isfile,isdir, join
+from PyQt5.QtWidgets import QTabBar
 
 
 class DragWidget(QFrame):
@@ -107,6 +101,35 @@ class DragWidget(QFrame):
             child.setPixmap(pixmap)
 
 
+#class Window(QWidget):
+#    def __init__(self,val):
+        # super(Window, self).__init__()
+        # hbox = QHBoxLayout(self)
+        # self.list_widget = QListWidget()
+        # self.list_widget.addItem(QListWidgetItem(QIcon(QPixmap('./images/closeicon.png')),'your text here'))
+        # self.list_widget.setIconSize(QSize(400,300)) #Set your image size
+        # hbox.addWidget(self.list_widget)
+        # self.setLayout(hbox)
+        # self.show()
+        # ------
+        # QWidget.__init__(self)
+        # mygroupbox = QGroupBox('this is my groupbox')
+        # myform = QFormLayout()
+        # labellist = []
+        # combolist = []
+        # for i in range(val):
+        #     labellist.append(QLabel('mylabel'))
+        #     combolist.append(QComboBox())
+        #     myform.addRow(labellist[i],combolist[i])
+        # mygroupbox.setLayout(myform)
+        # scroll = QScrollArea()
+        # scroll.setWidget(mygroupbox)
+        # scroll.setWidgetResizable(True)
+        # scroll.setFixedHeight(400)
+        # layout = QVBoxLayout(self)
+        # layout.addWidget(scroll)
+        # self.show()
+
 class Window(QWidget):
     def __init__(self, path):
         QWidget.__init__(self)
@@ -124,12 +147,12 @@ class Window(QWidget):
         scroll.setWidgetResizable(True)
         #scroll.setFixedHeight(100)
         self.setStyleSheet("""
-            QScrollBar:vertical { border:none; width:6px } 
+            QScrollBar:vertical { border:none; width:6px }
             QScrollBar::handle:vertical { background: lightgray; }
             QScrollBar::add-line:vertical { background: none; }
-            QScrollBar::sub-line:vertical { background: none; }            
+            QScrollBar::sub-line:vertical { background: none; }
             """)
-     
+
         # working:
         layout = QVBoxLayout(self)
         layout.addWidget(scroll)
@@ -146,28 +169,14 @@ class Window(QWidget):
                 print ("dire =", name)
                 #DragImage('directory.png',layout, path, name)
 
-#        palette = QPalette()
-#        palette.setBrush(QPalette.Background,QBrush(QPixmap("images/pattern.png")))
-#        mainWidget2 = QWidget()
-#        mainWidget2.setPalette(palette)
-#        horizontalLayout2 = QHBoxLayout()
-#        mainWidget2.setLayout(horizontalLayout2)
-#        horizontalLayout2.addWidget(DragWidget())
-#        mainWidget2.setWindowTitle("Draggable Iconsz")
-#        mainWidget2.show()
-
-
+        self.show()
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
 
-    window = Window("./")
-    window.setGeometry(500, 100, 300, 100)
-    window.show()
-
-    window2 = Window("./")
-    window2.setGeometry(100, 100, 300, 100)
-    window2.show()    
+    #window = Window(25)
+    window = Window('./')
+    window2 = Window('./')
 
     sys.exit(app.exec_())
