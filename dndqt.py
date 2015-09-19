@@ -4,18 +4,20 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import sys
-import os
-from os import listdir
-from os.path import isfile,isdir, join
-from PyQt5.QtWidgets import QTabBar
-from random import choice
+# import os
+# from os import listdir
+# from os.path import isfile, isdir, join
+# from PyQt5.QtWidgets import QTabBar
+# from random import choice
+
 
 class DragWidget(QFrame):
+
     def __init__(self, parent=None):
         super(DragWidget, self).__init__(parent)
 
         self.setMinimumSize(200, 200)
-        #self.setFrameStyle(QFrame.Sunken | QFrame.StyledPanel)
+        # self.setFrameStyle(QFrame.Sunken | QFrame.StyledPanel)
         self.setAcceptDrops(True)
 
         boatIcon = QLabel(self)
@@ -26,11 +28,9 @@ class DragWidget(QFrame):
 
         carIcon = QLabel(self)
         carIcon.setPixmap(QPixmap('./images/openicon.png'))
-        carIcon.move(120, 20)
+        carIcon.move(60, 20)
         carIcon.show()
         carIcon.setAttribute(Qt.WA_DeleteOnClose)
-
-
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat('application/x-dnditemdata'):
@@ -93,60 +93,53 @@ class DragWidget(QFrame):
         painter.end()
 
         child.setPixmap(tempPixmap)
-
-        if drag.exec_(Qt.CopyAction | Qt.MoveAction, Qt.CopyAction) == Qt.MoveAction:
+        if drag.exec_(Qt.CopyAction | Qt.MoveAction) == Qt.MoveAction:
             child.close()
         else:
             child.show()
             child.setPixmap(pixmap)
 
+
 class Window(QWidget):
-    def __init__(self, path):
-        QWidget.__init__(self)
-        self.path = path
-        mainWidget = QWidget()
+
+    def __init__(self, parent=None):
+        super(Window, self).__init__()
+        # self.setFixedHeight(200)
+
+        # Container Widget
+        widget = QWidget()
         palette = QPalette()
-        palette.setBrush(QPalette.Background,QBrush(QPixmap("images/pattern.png")))
-        mainWidget.setPalette(palette)
-
-        scroll = QScrollArea()
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        #scroll.setFrameShape(QFrame.NoFrame)
-        scroll.setWidget(mainWidget)
-        scroll.setWidgetResizable(True)
-        #scroll.setFixedHeight(100)
-        # self.setStyleSheet("""
-        #     QScrollBar:vertical { border:none; width:6px }
-        #     QScrollBar::handle:vertical { background: lightgray; }
-        #     QScrollBar::add-line:vertical { background: none; }
-        #     QScrollBar::sub-line:vertical { background: none; }
-        #     """)
-
-        # working:
+        palette.setBrush(
+            QPalette.Background, QBrush(QPixmap("images/pattern.png")))
+        widget.setPalette(palette)
+        # Layout of Container Widget
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0,0,0,0)
-        layout.setSpacing(0)
-        layout.addWidget(scroll)
-        myform = QHBoxLayout()
-        myform.addWidget(DragWidget())
-        mainWidget.setLayout(myform)
-        # -------
 
-        for name in os.listdir(path):
-            if os.path.isfile(os.path.join(path, name)):
-                print("file = ",name)
-                #DragImage('file.png',layout, path, name)
-            if os.path.isdir(os.path.join(path, name)):
-                print ("dire =", name)
-                #DragImage('directory.png',layout, path, name)
+        # for zz in range(3):
+        # btn = QPushButton("test"+str(zz))
+        # layout.addWidget(btn)
+        layout.addWidget(DragWidget())
+        # layout.addStretch()
+        widget.setLayout(layout)
+        # Scroll Area Properties
+        scroll = QScrollArea()
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        # scroll.setWidgetResizable.
+        scroll.setWidget(widget)
+
+        # Scroll Area Layer add
+        vlayout = QVBoxLayout(self)
+        vlayout.setContentsMargins(0, 0, 0, 0)
+        vlayout.setSpacing(0)
+        vlayout.addWidget(scroll)
+        self.setLayout(vlayout)
         self.show()
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    #window = Window(25)
+    # window = Window(25)
     window = Window('./')
-   # window2 = Window('./')
+    # window2 = Window('./')
     sys.exit(app.exec_())
