@@ -4,27 +4,51 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import sys
+import os
 
 
-class DragWidget(QFrame):
+class DragWidget(QWidget):
 
-    def __init__(self, parent=None):
+    spacerX = 16
+    spacerY = 16
+
+    def __init__(self, path, parent=None):
         super(DragWidget, self).__init__(parent)
 
         self.setMinimumSize(200, 200)
         self.setAcceptDrops(True)
+        self.path = path
 
-        self.test_icon1 = QLabel(self)
-        self.test_icon1.setPixmap(QPixmap('./images/closeicon.png'))
-        self.test_icon1.move(20, 20)
-        self.test_icon1.show()
-        self.test_icon1.setAttribute(Qt.WA_DeleteOnClose)
+        for name in os.listdir(path):
+            if os.path.isfile(os.path.join(path, name)):
+                print("file =", name)
+                self.name = name
+                foo = IconWidget(self)
+                foo.setText(name)
+                foo.setIcon(QPixmap('./images/file.png'))
+                foo.move(DragWidget.spacerX, DragWidget.spacerY)
+                foo.show()
+                foo.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.test_icon2 = QLabel(self)
-        self.test_icon2.setPixmap(QPixmap('./images/openicon.png'))
-        self.test_icon2.move(60, 20)
-        self.test_icon2.show()
-        self.test_icon2.setAttribute(Qt.WA_DeleteOnClose)
+            # if os.path.isdir(os.path.join(path, name)):
+            #     print("dire =", name)
+            #     # DragImage('directory.png', layout, path, name)
+            #     icon = QLabel(self)
+            #     icon.setPixmap(QPixmap('./images/folder.png'))
+            #     icon.move(DragWidget.spacerX, DragWidget.spacerY)
+            #     icon.show()
+            #     icon.setAttribute(Qt.WA_DeleteOnClose)
+                # label = QLabel(self)
+                # label.setText(name)
+                # label.move(DragWidget.spacerX, DragWidget.spacerY + 32)
+                # label.show()
+                # label.setAttribute(Qt.WA_DeleteOnClose)
+
+            if DragWidget.spacerX < self.minimumWidth():
+                DragWidget.spacerX += 48
+            else:
+                DragWidget.spacerX = 16
+                DragWidget.spacerY += 48
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat('application/x-dnditemdata'):
@@ -47,17 +71,26 @@ class DragWidget(QFrame):
             offset = QPoint()
             dataStream >> pixmap >> offset
 
-            newIcon = QLabel(self)
-            newIcon.setPixmap(pixmap)
+            # newIcon = QLabel(self)
+            # newIcon.setPixmap(pixmap)
+            # newIcon.move(event.pos() - offset)
+            # newIcon.show()
+            # newIcon.setAttribute(Qt.WA_DeleteOnClose)
+
+            newIcon = IconWidget()
+            newIcon.setText(self.name)
+            newIcon.setIcon(QPixmap(pixmap))
             newIcon.move(event.pos() - offset)
             newIcon.show()
             newIcon.setAttribute(Qt.WA_DeleteOnClose)
 
-            if newIcon.y()+32 > self.minimumHeight():
-                self.setMinimumHeight(newIcon.y()+32)
+            # self.label.move(newIcon.x(), newIcon.y()+32)
 
-            if newIcon.x()+32 > self.minimumWidth():
-                self.setMinimumWidth(newIcon.x()+32)
+            if newIcon.y() + 32 > self.minimumHeight():
+                self.setMinimumHeight(newIcon.y() + 32)
+
+            if newIcon.x() + 32 > self.minimumWidth():
+                self.setMinimumWidth(newIcon.x() + 32)
 
             if event.source() == self:
                 event.setDropAction(Qt.MoveAction)
@@ -72,6 +105,8 @@ class DragWidget(QFrame):
         if not child:
             return
 
+        # label = QLabel(child.label())
+        # print("label=", label)
         pixmap = QPixmap(child.pixmap())
 
         itemData = QByteArray()
@@ -93,24 +128,48 @@ class DragWidget(QFrame):
         painter.end()
 
         child.setPixmap(tempPixmap)
-        if drag.exec_(Qt.CopyAction | Qt.MoveAction) == Qt.MoveAction:
+        if drag.exec_(Qt.CopyAction |
+                      Qt.MoveAction, Qt.CopyAction) == Qt.MoveAction:
+            # if drag.exec_(Qt.CopyAction | Qt.MoveAction) == Qt.MoveAction:
             child.close()
         else:
             child.show()
             child.setPixmap(pixmap)
 
+    def mouseDoubleClickEvent(self, event):
+        print("Double Click")
+
+
+class IconWidget(QWidget):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._layout = QVBoxLayout(self)
+        self._icon = QLabel()
+        self._text = QLabel()
+        self._layout.addWidget(self._icon)
+        self._layout.addWidget(self._text)
+
+    def setText(self, text):
+        self._text.setText(text)
+
+    def setIcon(self, icon):
+        self._icon.setPixmap(icon)
+
 
 class Window(QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, path, parent=None):
         super(Window, self).__init__()
         self.pattern = "images/pattern.png"
+        self.path = path
         self.widget = QWidget()
         self.palette = QPalette()
-        self.palette.setBrush(QPalette.Background, QBrush(QPixmap(self.pattern)))
+        self.palette.setBrush(QPalette.Background,
+                              QBrush(QPixmap(self.pattern)))
         self.widget.setPalette(self.palette)
         layout = QVBoxLayout(self)
-        layout.addWidget(DragWidget())
+        layout.addWidget(DragWidget(path))
         self.widget.setLayout(layout)
         scroll = QScrollArea()
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -138,5 +197,5 @@ class Window(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = Window('./')
-    window2 = Window('./')
+    # window2 = Window('./')
     sys.exit(app.exec_())
