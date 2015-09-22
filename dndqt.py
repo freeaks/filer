@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import sys
 import os
+# from pprint import pprint
 
 
 class DragWidget(QWidget):
@@ -18,37 +19,20 @@ class DragWidget(QWidget):
         self.setMinimumSize(200, 200)
         self.setAcceptDrops(True)
         self.path = path
+        # for name in os.listdir(path):
+        #     if os.path.isfile(os.path.join(path, name)):
+        #         self.name = name
+        #         foo = IconWidget(self)
+        #         foo.setText(name)
+        #         foo.setIcon(QPixmap('./images/file.png'))
+        #         foo.move(DragWidget.spacerX, DragWidget.spacerY)
+        #         foo.setAttribute(Qt.WA_DeleteOnClose)
 
-        for name in os.listdir(path):
-            if os.path.isfile(os.path.join(path, name)):
-                print("file =", name)
-                self.name = name
-                foo = IconWidget(self)
-                foo.setText(name)
-                foo.setIcon(QPixmap('./images/file.png'))
-                foo.move(DragWidget.spacerX, DragWidget.spacerY)
-                foo.show()
-                foo.setAttribute(Qt.WA_DeleteOnClose)
-
-            # if os.path.isdir(os.path.join(path, name)):
-            #     print("dire =", name)
-            #     # DragImage('directory.png', layout, path, name)
-            #     icon = QLabel(self)
-            #     icon.setPixmap(QPixmap('./images/folder.png'))
-            #     icon.move(DragWidget.spacerX, DragWidget.spacerY)
-            #     icon.show()
-            #     icon.setAttribute(Qt.WA_DeleteOnClose)
-                # label = QLabel(self)
-                # label.setText(name)
-                # label.move(DragWidget.spacerX, DragWidget.spacerY + 32)
-                # label.show()
-                # label.setAttribute(Qt.WA_DeleteOnClose)
-
-            if DragWidget.spacerX < self.minimumWidth():
-                DragWidget.spacerX += 48
-            else:
-                DragWidget.spacerX = 16
-                DragWidget.spacerY += 48
+        foo = IconWidget(self)
+        foo.setText("name")
+        foo.setIcon(QPixmap('./images/file.png'))
+        foo.move(16, 16)
+        foo.setAttribute(Qt.WA_DeleteOnClose)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat('application/x-dnditemdata'):
@@ -56,8 +40,10 @@ class DragWidget(QWidget):
                 event.setDropAction(Qt.MoveAction)
                 event.accept()
             else:
+                print("DragEnterEvent: event.source")
                 event.acceptProposedAction()
         else:
+            print("DragEnterEvent: event.mimeData")
             event.ignore()
 
     dragMoveEvent = dragEnterEvent
@@ -77,14 +63,14 @@ class DragWidget(QWidget):
             # newIcon.show()
             # newIcon.setAttribute(Qt.WA_DeleteOnClose)
 
-            newIcon = IconWidget()
-            newIcon.setText(self.name)
-            newIcon.setIcon(QPixmap(pixmap))
+            newIcon = IconWidget(self)
+            newIcon.setText("self.name")
+            newIcon.setIcon(pixmap)
             newIcon.move(event.pos() - offset)
             newIcon.show()
             newIcon.setAttribute(Qt.WA_DeleteOnClose)
 
-            # self.label.move(newIcon.x(), newIcon.y()+32)
+            print("dropEvent ..")
 
             if newIcon.y() + 32 > self.minimumHeight():
                 self.setMinimumHeight(newIcon.y() + 32)
@@ -96,20 +82,21 @@ class DragWidget(QWidget):
                 event.setDropAction(Qt.MoveAction)
                 event.accept()
             else:
+                print("dropEvent:  event.source")
                 event.acceptProposedAction()
         else:
+            print("dropEvent: event.mimeData")
             event.ignore()
 
     def mousePressEvent(self, event):
         child = self.childAt(event.pos())
         if not child:
+            prin("not child")
             return
 
-        # label = QLabel(child.label())
-        # print("label=", label)
         pixmap = QPixmap(child.pixmap())
-
         itemData = QByteArray()
+
         dataStream = QDataStream(itemData, QIODevice.WriteOnly)
         dataStream << pixmap << QPoint(event.pos() - child.pos())
 
@@ -133,6 +120,7 @@ class DragWidget(QWidget):
             # if drag.exec_(Qt.CopyAction | Qt.MoveAction) == Qt.MoveAction:
             child.close()
         else:
+            print("mousePressEvent: drag.exec")
             child.show()
             child.setPixmap(pixmap)
 
@@ -144,17 +132,19 @@ class IconWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._layout = QVBoxLayout(self)
-        self._icon = QLabel()
-        self._text = QLabel()
-        self._layout.addWidget(self._icon)
-        self._layout.addWidget(self._text)
+        self.layout = QVBoxLayout(self)
+        self.icon = QLabel()
+        self.text = QLabel()
+        self.layout.addWidget(self.icon)
+        self.layout.addWidget(self.text)
 
     def setText(self, text):
-        self._text.setText(text)
+        self.text.setText(text)
 
     def setIcon(self, icon):
-        self._icon.setPixmap(icon)
+        self.icon.setPixmap(icon)
+
+    # def move(self,)
 
 
 class Window(QWidget):
@@ -196,6 +186,7 @@ class Window(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    # help(QIcon)
     window = Window('./')
     # window2 = Window('./')
     sys.exit(app.exec_())
