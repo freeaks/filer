@@ -1,11 +1,12 @@
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+import os
 
 
 class IconWidget(QWidget):
 
-    def __init__(self, parent=None, name="None", path="None", dire=False):
+    def __init__(self, parent=None, name="None", path="None"):
         super().__init__(parent)
         self.mimetext = "application/x-icon"
         self.layout = QVBoxLayout(self)
@@ -15,16 +16,18 @@ class IconWidget(QWidget):
         self.text = QLabel(name)
         self.name = name
         self.path = path
-        self.dire = dire
+        self.iconRender(path, name)
         self.selected = False
         self.layout.addWidget(self.icon)
-        self.layout.addWidget(self.text)
-        if dire:
+        self.layout.addWidget(self.text)            
+
+    def iconRender(self, path, name):
+        if os.path.isdir(name):
             self.setIcon(QPixmap("./images/folder.png"))
         else:
             self.setIcon(QPixmap("./images/file.png"))
 
-    def updateIcon(self, status):
+    def IconSelect(self, status):
         if status == "selected":
             self.selected = True 
             self.setColor()

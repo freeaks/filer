@@ -17,7 +17,7 @@ class DragWidget(QWidget):
         self.path = path
         # self.name = name
         for name in os.listdir(path):
-            self.icon = IconWidget(self, name=name, path=path, dire=os.path.isfile(name))
+            self.icon = IconWidget(self, name=name, path=path)
             self.icon.move(DragWidget.spacerX, DragWidget.spacerY)
             self.icon.setAttribute(Qt.WA_DeleteOnClose)
             # initial icon placement
@@ -70,14 +70,14 @@ class DragWidget(QWidget):
         self.mchild = self.childAt(event.pos())
         # click on nothing cancels selection
         if self.childAt(event.pos()) == None:
-            self.icon.updateIcon("notselected")
+            self.icon.IconSelect("notselected")
 
         # click on icon to select it
         for item in self.children():
             if item.getIcon() == self.mchild:
-                self.icon.updateIcon("notselected")
+                self.icon.IconSelect("notselected")
                 self.icon = item
-                self.icon.updateIcon("selected")
+                self.icon.IconSelect("selected")
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click")
