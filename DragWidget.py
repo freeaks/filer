@@ -16,18 +16,19 @@ class DragWidget(QWidget):
         self.setAcceptDrops(True)
         self.path = path
         # self.name = name
-        for name in os.listdir(path):
-            self.icon = IconWidget(self, name=name, path=path)
-            self.icon.move(DragWidget.spacerX, DragWidget.spacerY)
-            self.icon.setAttribute(Qt.WA_DeleteOnClose)
+        self.icon = IconWidget(self, name="name", path=self.path)
+        # for name in os.listdir(path):
+        #     self.icon = IconWidget(self, name=name, path=path)
+        #     self.icon.move(DragWidget.spacerX, DragWidget.spacerY)
+        #     self.icon.setAttribute(Qt.WA_DeleteOnClose)
             # initial icon placement
-            DragWidget.spacerX += 64
-            if DragWidget.spacerX + 64 > self.minimumWidth():
-                DragWidget.spacerY += 64
-                DragWidget.spacerX = 16
-        # reset placement values
-        DragWidget.spacerX = 16
-        DragWidget.spacerY = 16
+        #     DragWidget.spacerX += 64
+        #     if DragWidget.spacerX + 64 > self.minimumWidth():
+        #         DragWidget.spacerY += 64
+        #         DragWidget.spacerX = 16
+        # # reset placement values
+        # DragWidget.spacerX = 16
+        # DragWidget.spacerY = 16
 
     def updateScrollArea(self):
         """ set the dimension of the widget """
@@ -50,21 +51,9 @@ class DragWidget(QWidget):
         if self.icon.selected:
             event.accept()
             if event.mimeData().hasFormat("application/x-icon"):
-                self.icon.move(event.pos().x(), event.pos().y())
+                # self.icon.move(event.pos().x(), event.pos().y())
+                self.icon = IconWidget(self, name="name", path=self.path)
                 self.updateScrollArea()
-
-    def mouseMoveEvent(self, event):
-        # if the left mouse button is used
-        if event.buttons() == Qt.LeftButton:
-            if self.icon.selected:
-                self.mimetext = self.icon.mimetext
-                data = QByteArray()
-                mime_data = QMimeData()
-                mime_data.setData(self.mimetext, data)
-                drag = QDrag(self)
-                drag.setMimeData(mime_data)
-                drag.setHotSpot(self.rect().topLeft())  # where do we drag from
-                drag.exec_(Qt.MoveAction)
 
     def mousePressEvent(self, event):
         self.mchild = self.childAt(event.pos())
