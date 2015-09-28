@@ -32,9 +32,9 @@ class IconWidget(QWidget):
             drag.setMimeData(mime_data)
             drag.setHotSpot(self.rect().topLeft())  # where do we drag from
             drag.exec_(Qt.MoveAction)
-            if drag.exec_(Qt.MoveAction): 
-                self.parent().icons.remove(self)
-                self.deleteLater()
+            # if drag.exec_(Qt.MoveAction): 
+            #     self.parent().icons.remove(self)
+            #     self.deleteLater()
 
     def iconRender(self, path, name):
         if os.path.isdir(name):
