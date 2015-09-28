@@ -21,12 +21,10 @@ class IconWidget(QWidget):
         self.layout.addWidget(self.icon)
         self.layout.addWidget(self.text)            
 
-
     def mouseMoveEvent(self, event):
         # if the left mouse button is used
         if event.buttons() == Qt.LeftButton:
             if self.selected:
-                self.mimetext = self.mimetext
                 data = QByteArray()
                 mime_data = QMimeData()
                 mime_data.setData(self.mimetext, data)
@@ -34,7 +32,6 @@ class IconWidget(QWidget):
                 drag.setMimeData(mime_data)
                 drag.setHotSpot(self.rect().topLeft())  # where do we drag from
                 drag.exec_(Qt.MoveAction)
-
 
     def iconRender(self, path, name):
         if os.path.isdir(name):
