@@ -16,7 +16,19 @@ class DragWidget(QWidget):
         self.setAcceptDrops(True)
         self.path = path
         self.icons = []
-        self.icons.append(IconWidget(self, name="name", path=self.path))
+        
+        for name in os.listdir(path):
+            self.icons.append(IconWidget(self, name=name, path=self.path))
+            self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
+            self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
+            # initial icon placement
+            DragWidget.spacerX += 64
+            if DragWidget.spacerX + 64 > self.minimumWidth():
+                DragWidget.spacerY += 64
+                DragWidget.spacerX = 16
+        # reset placement values
+        DragWidget.spacerX = 16
+        DragWidget.spacerY = 16
 
     def updateScrollArea(self):
         # """ set the dimension of the widget """
@@ -40,14 +52,12 @@ class DragWidget(QWidget):
         # if self.icon.selected:
         event.accept()
         if event.mimeData().hasFormat("application/x-icon"):
-            # self.icon.move(event.pos().x(), event.pos().y())
-            print("the len is=", len(self.icons))
-            self.icons.remove(self.icons[0])
-            # self.icons.deleteLater()
+
             self.icons.append(IconWidget(self, name="name", path=self.path))
-            print("len=", len(self.icons))
-            self.icons[0].move(event.pos().x(), event.pos().y())
-            self.icons[0].show()
+            # print("dropEvent len=", len(self.icons))
+            self.icons[-1].move(event.pos().x(), event.pos().y())
+            self.icons[-1].show()
+
             # self.updateScrollArea()
 
     def mousePressEvent(self, event):

@@ -19,7 +19,8 @@ class IconWidget(QWidget):
         self.iconRender(path, name)
         self.selected = False
         self.layout.addWidget(self.icon)
-        self.layout.addWidget(self.text)            
+        self.layout.addWidget(self.text)  
+        # print("icon=", self)          
 
     def mouseMoveEvent(self, event):
         # if the left mouse button is used
@@ -31,10 +32,13 @@ class IconWidget(QWidget):
             drag = QDrag(self)
             drag.setMimeData(mime_data)
             drag.setHotSpot(self.rect().topLeft())  # where do we drag from
-            drag.exec_(Qt.MoveAction)
-            # if drag.exec_(Qt.MoveAction): 
-            #     self.parent().icons.remove(self)
-            #     self.deleteLater()
+            # drag.exec_(Qt.MoveAction)
+
+            if drag.exec_(Qt.MoveAction): 
+                # print("mouseMoveEv=", len(self.parent().icons))
+                # print("deleting icon=", self)
+                self.parent().icons.remove(self)
+                self.deleteLater()
 
     def iconRender(self, path, name):
         if os.path.isdir(name):
