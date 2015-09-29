@@ -16,7 +16,7 @@ class DragWidget(QWidget):
         self.setAcceptDrops(True)
         self.path = path
         self.icons = []
-        
+        self.temp_drop = ""
         for name in os.listdir(path):
             self.icons.append(IconWidget(self, name=name, path=self.path))
             self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
@@ -29,17 +29,17 @@ class DragWidget(QWidget):
         # reset placement values
         DragWidget.spacerX = 16
         DragWidget.spacerY = 16
+        self.updateScrollArea()
 
     def updateScrollArea(self):
-        # """ set the dimension of the widget """
-        # iconx = []
-        # icony = []
-        # for item in self.children():
-        #     if type(item) == IconWidget:
-        #         iconx.append(item.x())
-        #         icony.append(item.y())
-        # self.setMinimumWidth(max(iconx)+64)
-        # self.setMinimumHeight(max(icony)+64)
+        """ set the dimension of the widget """
+        iconx = []
+        icony = []
+        for item in self.icons:
+                iconx.append(item.x())
+                icony.append(item.y())
+        self.setMinimumWidth(max(iconx)+64)
+        self.setMinimumHeight(max(icony)+64)
         pass
         
     def dragEnterEvent(self, event):
@@ -52,27 +52,17 @@ class DragWidget(QWidget):
         # if self.icon.selected:
         event.accept()
         if event.mimeData().hasFormat("application/x-icon"):
-
-            self.icons.append(IconWidget(self, name="name", path=self.path))
+            # print("icon=", event.source().name)
+            name = event.source().name
+            self.icons.append(IconWidget(self, name=name, path=self.path))
             # print("dropEvent len=", len(self.icons))
             self.icons[-1].move(event.pos().x(), event.pos().y())
             self.icons[-1].show()
-
-            # self.updateScrollArea()
+            self.updateScrollArea()
 
     def mousePressEvent(self, event):
-        # self.mchild = self.childAt(event.pos())
-        # # click on nothing cancels selection
-        # if self.childAt(event.pos()) == None:
-        #     self.icons[0].IconSelect("notselected")
-
-        # # click on icon to select it
-        # for item in self.icons:
-        #     if item.getIcon() == self.mchild:
-        #         self.icons[0].IconSelect("notselected")
-        #         self.icon = item
-        #         self.icon.IconSelect("selected")
-        pass
+        for item in self.icons:
+            item.IconSelect(False)
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click")

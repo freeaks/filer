@@ -29,6 +29,8 @@ class IconWidget(QWidget):
             data = QByteArray()
             mime_data = QMimeData()
             mime_data.setData(self.mimetext, data)
+            # mime_data.setText(self.name)
+            # mime_data.setImageData(self.getIcon())
             drag = QDrag(self)
             drag.setMimeData(mime_data)
             drag.setHotSpot(self.rect().topLeft())  # where do we drag from
@@ -40,6 +42,14 @@ class IconWidget(QWidget):
                 self.parent().icons.remove(self)
                 self.deleteLater()
 
+    def mousePressEvent(self, event):
+        for item in self.parent().icons:
+            item.IconSelect(False)
+        self.IconSelect(True)
+
+    def mouseDoubleClickEvent(self, event):
+        pass
+
     def iconRender(self, path, name):
         if os.path.isdir(name):
             self.setIcon(QPixmap("./images/folder.png"))
@@ -47,7 +57,7 @@ class IconWidget(QWidget):
             self.setIcon(QPixmap("./images/file.png"))
 
     def IconSelect(self, status):
-        if status == "selected":
+        if status:
             self.selected = True 
             self.setColor()
         else:
