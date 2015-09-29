@@ -58,7 +58,11 @@ class DragWidget(QWidget):
         if event.mimeData().hasFormat("application/x-icon"):
             # print("icon=", event.source().name)
             name = event.source().name
-            self.icons.append(IconWidget(self, name=name, path=self.path))
+            # self.icons.append(IconWidget(self, name=name, path=self.path))
+            icon_widget = IconWidget(self, name=name, path=self.path)
+            icon_widget.go_deeper.connect(self.go_deeper.emit)
+            self.icons.append(icon_widget)
+            
             # print("dropEvent len=", len(self.icons))
             self.icons[-1].move(event.pos().x(), event.pos().y())
             self.icons[-1].show()
