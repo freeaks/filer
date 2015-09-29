@@ -15,13 +15,17 @@ class Window(QWidget):
         self.setWindowTitle(path)
         self.pattern = "images/pattern.png"
         self.path = path
+        self.child_windows = []
         self.widget = QWidget()
         self.palette = QPalette()
         self.palette.setBrush(QPalette.Background,
                               QBrush(QPixmap(self.pattern)))
         self.widget.setPalette(self.palette)
         layout = QVBoxLayout(self)
-        layout.addWidget(DragWidget(path))
+        # layout.addWidget(DragWidget(path))
+        self._drag_widget = DragWidget(path)
+        self._drag_widget.go_deeper.connect(self.on_go_deeper)
+        layout.addWidget(self._drag_widget)
         self.widget.setLayout(layout)
         scroll = QScrollArea()
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -45,6 +49,8 @@ class Window(QWidget):
         self.setLayout(vlayout)
         self.show()
 
+    def on_go_deeper(self, path):
+        self.child_windows.append(Window(path))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

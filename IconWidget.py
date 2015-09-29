@@ -6,6 +6,7 @@ import os
 
 
 class IconWidget(QWidget):
+    go_deeper = pyqtSignal(str)
 
     def __init__(self, parent=None, name="None", path="None"):
         super().__init__(parent)
@@ -52,10 +53,13 @@ class IconWidget(QWidget):
     def mouseDoubleClickEvent(self, event):
         if self.kind == "directory":
             print("double click icon")
-            Window(path="./test-tree")
+            # Window(path="./test-tree")
+            print("ahuu=", os.path.join(self.path, self.name))
+            self.go_deeper.emit(os.path.join(self.path, self.name))
 
     def iconRender(self, path, name):
-        if os.path.isdir(name):
+        # if os.path.isdir(name):
+        if os.path.isdir(os.path.join(path, name)):
             self.setIcon(QPixmap("./images/folder.png"))
             self.kind = "directory"
         else:

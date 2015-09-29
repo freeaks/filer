@@ -8,6 +8,7 @@ import os
 class DragWidget(QWidget):
     spacerX = 16
     spacerY = 16
+    go_deeper = pyqtSignal(str)
 
     def __init__(self, path, parent=None):
         super(DragWidget, self).__init__(parent)
@@ -18,7 +19,10 @@ class DragWidget(QWidget):
         self.icons = []
         self.temp_drop = ""
         for name in os.listdir(path):
-            self.icons.append(IconWidget(self, name=name, path=self.path))
+            # self.icons.append(IconWidget(self, name=name, path=self.path))
+            icon_widget = IconWidget(self, name=name, path=self.path)
+            icon_widget.go_deeper.connect(self.go_deeper.emit)
+            self.icons.append(icon_widget)
             self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
             # initial icon placement
