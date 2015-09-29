@@ -34,7 +34,7 @@ class IconWidget(QWidget):
             mime_data.setData(self.mimetext, data)
             # mime_data.setText(self.name)
             # mime_data.setImageData(self.getIcon())
-            drag = QDrag(self)
+            drag = QDrag(self) 
             drag.setMimeData(mime_data)
             drag.setHotSpot(self.rect().topLeft())  # where do we drag from
             # drag.exec_(Qt.MoveAction)
@@ -51,10 +51,7 @@ class IconWidget(QWidget):
         self.IconSelect(True)
 
     def mouseDoubleClickEvent(self, event):
-        if self.kind == "directory":
-            print("double click icon")
-            # Window(path="./test-tree")
-            print("ahuu=", os.path.join(self.path, self.name))
+        if self.kind == "directory": 
             self.go_deeper.emit(os.path.join(self.path, self.name))
 
     def iconRender(self, path, name):
