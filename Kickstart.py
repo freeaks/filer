@@ -3,7 +3,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from IconWidget import *
+# from IconWidget import *
 from DragWidget import *
 import sys
 

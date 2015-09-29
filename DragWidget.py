@@ -66,3 +66,4 @@ class DragWidget(QWidget):
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click")
+        # Window("./test-tree")

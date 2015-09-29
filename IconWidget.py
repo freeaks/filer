@@ -1,6 +1,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from Kickstart import *
 import os
 
 
@@ -16,6 +17,7 @@ class IconWidget(QWidget):
         self.text = QLabel(name)
         self.name = name
         self.path = path
+        self.kind = "icon or directory"
         self.iconRender(path, name)
         self.selected = False
         self.layout.addWidget(self.icon)
@@ -48,13 +50,17 @@ class IconWidget(QWidget):
         self.IconSelect(True)
 
     def mouseDoubleClickEvent(self, event):
-        pass
+        if self.kind == "directory":
+            print("double click icon")
+            Window(path="./test-tree")
 
     def iconRender(self, path, name):
         if os.path.isdir(name):
             self.setIcon(QPixmap("./images/folder.png"))
+            self.kind = "directory"
         else:
             self.setIcon(QPixmap("./images/file.png"))
+            self.kind = "file"
 
     def IconSelect(self, status):
         if status:
