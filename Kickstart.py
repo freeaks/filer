@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from PyQt5.QtGui import *
+from PyQt5 import QtGui
+# from PyQt5 import QMessageBox
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-# from IconWidget import *
 from DragWidget import *
 import sys
 
@@ -19,11 +19,10 @@ class Window(QWidget):
         self.path = path
         self.widget = QWidget()
         self.palette = QPalette()
-        self.palette.setBrush(QPalette.Background,
-                              QBrush(QPixmap(self.pattern)))
+        self.palette.setBrush(
+            QPalette.Background, QBrush(QPixmap(self.pattern)))
         self.widget.setPalette(self.palette)
         layout = QVBoxLayout(self)
-        # layout.addWidget(DragWidget(path))
         self._drag_widget = DragWidget(path)
         self._drag_widget.new_window.connect(self.on_make_new_window)
         self._drag_widget.query.connect(self.on_query)
@@ -55,21 +54,32 @@ class Window(QWidget):
         Window.child_windows.append(Window(path))
 
     def closeEvent(self, event):
-        for item in Window.child_windows:
-            if item.windowTitle() == self.windowTitle():
-                Window.child_windows.remove(item)
-                item.deleteLater()
+        if len(Window.child_windows) == 0:
+            result = QMessageBox.question(self,
+                                          "Confirm Exit...",
+                                          "Are you sure you want to exit ?",
+                                          QMessageBox.Yes | QMessageBox.No)
+            event.ignore()
+
+            if result == QMessageBox.Yes:
+                event.accept()
+        else:
+            for item in Window.child_windows:
+                if item.windowTitle() == self.windowTitle():
+                    Window.child_windows.remove(item)
+                    item.deleteLater()
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window
         print("got query=", self.windowTitle(),
               "obj=", self, "type=", type(self),
-              "len CW=", len(Window.child_windows))
-        
+              "len child_windows=", len(Window.child_windows))
+
         for item in Window.child_windows:
-            print("loop child_window=", type(item), "title=", item.windowTitle())
+            print("loop child_window=", type(
+                item), "title=", item.windowTitle())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Window('./') 
+    window = Window('./')
     sys.exit(app.exec_())
