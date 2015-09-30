@@ -7,7 +7,7 @@ import os
 class DragWidget(QWidget):
     spacerX = 16
     spacerY = 16
-    new_window = pyqtSignal(str)
+    windowclass_signal = pyqtSignal(str)
     query = pyqtSignal()
 
     def __init__(self, path, parent=None):
@@ -19,7 +19,7 @@ class DragWidget(QWidget):
         self.temp_drop = ""
         for name in os.listdir(path):
             icon_widget = IconWidget(self, name=name, path=self.path)
-            icon_widget.new_window.connect(self.new_window.emit)
+            icon_widget.new_window.connect(self.windowclass_signal.emit)
             self.icons.append(icon_widget)
             self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
@@ -55,7 +55,7 @@ class DragWidget(QWidget):
         if event.mimeData().hasFormat("application/x-icon"):
             name = event.source().name
             icon_widget = IconWidget(self, name=name, path=self.path)
-            icon_widget.new_window.connect(self.new_window.emit)
+            icon_widget.new_window.connect(self.windowclass_signal.emit)
             self.icons.append(icon_widget)
             self.icons[-1].move(event.pos().x(), event.pos().y())
             self.icons[-1].show()

@@ -23,7 +23,7 @@ class Window(QWidget):
         self.widget.setPalette(self.palette)
         layout = QVBoxLayout(self)
         self._drag_widget = DragWidget(path)
-        self._drag_widget.new_window.connect(self.on_make_new_window)
+        self._drag_widget.windowclass_signal.connect(self.on_make_new_window)
         self._drag_widget.query.connect(self.on_query)
         layout.addWidget(self._drag_widget)
         self.widget.setLayout(layout)
@@ -49,14 +49,14 @@ class Window(QWidget):
         self.setLayout(vlayout)
         self.show()
 
-    def on_make_new_window(self, path):
-        Window.child_windows.append(Window(path))
-
     def closeEvent(self, event):
         for item in Window.child_windows:
             if item.windowTitle() == self.windowTitle():
                 Window.child_windows.remove(item)
                 item.deleteLater()
+
+    def on_make_new_window(self, path):
+        Window.child_windows.append(Window(path))
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window
