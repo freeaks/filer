@@ -1,7 +1,6 @@
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-# from Kickstart import *
+from PyQt5.QtGui import QPixmap, QPalette, QDrag
+from PyQt5.QtCore import Qt, QByteArray, QMimeData, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel 
 import os
 
 

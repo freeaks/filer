@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-from PyQt5 import QtGui
-# from PyQt5 import QMessageBox
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from DragWidget import *
+from PyQt5.QtGui import QPalette, QBrush, QPixmap 
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QVBoxLayout, QScrollArea, QWidget
+from DragWidget import DragWidget
 import sys
 
 
@@ -54,20 +53,10 @@ class Window(QWidget):
         Window.child_windows.append(Window(path))
 
     def closeEvent(self, event):
-        if len(Window.child_windows) == 0:
-            result = QMessageBox.question(self,
-                                          "Confirm Exit...",
-                                          "Are you sure you want to exit ?",
-                                          QMessageBox.Yes | QMessageBox.No)
-            event.ignore()
-
-            if result == QMessageBox.Yes:
-                event.accept()
-        else:
-            for item in Window.child_windows:
-                if item.windowTitle() == self.windowTitle():
-                    Window.child_windows.remove(item)
-                    item.deleteLater()
+        for item in Window.child_windows:
+            if item.windowTitle() == self.windowTitle():
+                Window.child_windows.remove(item)
+                item.deleteLater()
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window
