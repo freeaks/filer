@@ -9,6 +9,7 @@ class DragWidget(QWidget):
     spacerX = 16
     spacerY = 16
     go_deeper = pyqtSignal(str)
+    query = pyqtSignal()
 
     def __init__(self, path, parent=None):
         super(DragWidget, self).__init__(parent)
@@ -74,4 +75,7 @@ class DragWidget(QWidget):
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click")
+        # self.query.connect(self.query.emit)
+        self.query.emit()
+        # print("zz", self.parent().child_windows)
         # Window("./test-tree")

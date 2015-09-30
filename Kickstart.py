@@ -25,6 +25,7 @@ class Window(QWidget):
         # layout.addWidget(DragWidget(path))
         self._drag_widget = DragWidget(path)
         self._drag_widget.go_deeper.connect(self.on_go_deeper)
+        self._drag_widget.query.connect(self.on_query)
         layout.addWidget(self._drag_widget)
         self.widget.setLayout(layout)
         scroll = QScrollArea()
@@ -50,7 +51,26 @@ class Window(QWidget):
         self.show()
 
     def on_go_deeper(self, path):
+        for item in self.child_windows:
+            print("all_wintitle=", item.windowTitle())
         self.child_windows.append(Window(path))
+        print("win_len =", len(self.child_windows),
+              "obj=", self, "type=", type(self.child_windows[0]),
+              "self.title", self.windowTitle())
+
+    def closeEvent(self, event):
+        print("got closed=", self.windowTitle(), "obj=", self, "type=", type(self))
+        # self.child_windows.remove(self)
+        print("win_number AF =", len(self.child_windows))
+        for item in self.child_windows:
+            if item.windowTitle() == self.windowTitle():
+                self.child_windows.remove(item)
+                item.deleteLater()
+
+    def on_query(self):
+        print("got query=", self.windowTitle(), "obj=", self, "type=", type(self), "len CW=", len(self.child_windows))
+        for item in self.child_windows:
+            print("loop child_window=", type(item), "title=", item.windowTitle())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
