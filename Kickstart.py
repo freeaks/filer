@@ -10,12 +10,13 @@ import sys
 
 class Window(QWidget):
 
+    child_windows = []
+
     def __init__(self, path, parent=None):
         super(Window, self).__init__()
         self.setWindowTitle(path)
         self.pattern = "images/pattern.png"
         self.path = path
-        self.child_windows = []
         self.widget = QWidget()
         self.palette = QPalette()
         self.palette.setBrush(QPalette.Background,
@@ -24,7 +25,7 @@ class Window(QWidget):
         layout = QVBoxLayout(self)
         # layout.addWidget(DragWidget(path))
         self._drag_widget = DragWidget(path)
-        self._drag_widget.go_deeper.connect(self.on_go_deeper)
+        self._drag_widget.new_window.connect(self.on_make_new_window)
         self._drag_widget.query.connect(self.on_query)
         layout.addWidget(self._drag_widget)
         self.widget.setLayout(layout)
@@ -50,26 +51,22 @@ class Window(QWidget):
         self.setLayout(vlayout)
         self.show()
 
-    def on_go_deeper(self, path):
-        for item in self.child_windows:
-            print("all_wintitle=", item.windowTitle())
-        self.child_windows.append(Window(path))
-        print("win_len =", len(self.child_windows),
-              "obj=", self, "type=", type(self.child_windows[0]),
-              "self.title", self.windowTitle())
+    def on_make_new_window(self, path):
+        Window.child_windows.append(Window(path))
 
     def closeEvent(self, event):
-        print("got closed=", self.windowTitle(), "obj=", self, "type=", type(self))
-        # self.child_windows.remove(self)
-        print("win_number AF =", len(self.child_windows))
-        for item in self.child_windows:
+        for item in Window.child_windows:
             if item.windowTitle() == self.windowTitle():
-                self.child_windows.remove(item)
+                Window.child_windows.remove(item)
                 item.deleteLater()
 
     def on_query(self):
-        print("got query=", self.windowTitle(), "obj=", self, "type=", type(self), "len CW=", len(self.child_windows))
-        for item in self.child_windows:
+        # get info when doubleclicking on nothing in a window
+        print("got query=", self.windowTitle(),
+              "obj=", self, "type=", type(self),
+              "len CW=", len(Window.child_windows))
+        
+        for item in Window.child_windows:
             print("loop child_window=", type(item), "title=", item.windowTitle())
 
 if __name__ == '__main__':

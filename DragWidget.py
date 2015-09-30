@@ -8,21 +8,19 @@ import os
 class DragWidget(QWidget):
     spacerX = 16
     spacerY = 16
-    go_deeper = pyqtSignal(str)
+    new_window = pyqtSignal(str)
     query = pyqtSignal()
 
     def __init__(self, path, parent=None):
         super(DragWidget, self).__init__(parent)
-
         self.setMinimumSize(200, 200)
         self.setAcceptDrops(True)
         self.path = path
         self.icons = []
         self.temp_drop = ""
         for name in os.listdir(path):
-            # self.icons.append(IconWidget(self, name=name, path=self.path))
             icon_widget = IconWidget(self, name=name, path=self.path)
-            icon_widget.go_deeper.connect(self.go_deeper.emit)
+            icon_widget.new_window.connect(self.new_window.emit)
             self.icons.append(icon_widget)
             self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
@@ -54,17 +52,12 @@ class DragWidget(QWidget):
         event.accept()
 
     def dropEvent(self, event):
-        # if self.icon.selected:
         event.accept()
         if event.mimeData().hasFormat("application/x-icon"):
-            # print("icon=", event.source().name)
             name = event.source().name
-            # self.icons.append(IconWidget(self, name=name, path=self.path))
             icon_widget = IconWidget(self, name=name, path=self.path)
-            icon_widget.go_deeper.connect(self.go_deeper.emit)
+            icon_widget.new_window.connect(self.new_window.emit)
             self.icons.append(icon_widget)
-            
-            # print("dropEvent len=", len(self.icons))
             self.icons[-1].move(event.pos().x(), event.pos().y())
             self.icons[-1].show()
             self.updateScrollArea()
@@ -74,8 +67,5 @@ class DragWidget(QWidget):
             item.IconSelect(False)
 
     def mouseDoubleClickEvent(self, event):
-        print("Double Click")
-        # self.query.connect(self.query.emit)
+        print("Double Click") 
         self.query.emit()
-        # print("zz", self.parent().child_windows)
-        # Window("./test-tree")

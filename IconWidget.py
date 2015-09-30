@@ -6,7 +6,7 @@ import os
 
 
 class IconWidget(QWidget):
-    go_deeper = pyqtSignal(str)
+    new_window = pyqtSignal(str)
 
     def __init__(self, parent=None, name="None", path="None"):
         super().__init__(parent)
@@ -22,26 +22,18 @@ class IconWidget(QWidget):
         self.iconRender(path, name)
         self.selected = False
         self.layout.addWidget(self.icon)
-        self.layout.addWidget(self.text)  
-        # print("icon=", self)          
+        self.layout.addWidget(self.text)
 
     def mouseMoveEvent(self, event):
         # if the left mouse button is used
         if event.buttons() == Qt.LeftButton:
-            # if self.selected:
             data = QByteArray()
             mime_data = QMimeData()
             mime_data.setData(self.mimetext, data)
-            # mime_data.setText(self.name)
-            # mime_data.setImageData(self.getIcon())
             drag = QDrag(self) 
             drag.setMimeData(mime_data)
             drag.setHotSpot(self.rect().topLeft())  # where do we drag from
-            # drag.exec_(Qt.MoveAction)
-
-            if drag.exec_(Qt.MoveAction): 
-                # print("mouseMoveEv=", len(self.parent().icons))
-                # print("deleting icon=", self)
+            if drag.exec_(Qt.MoveAction):
                 self.parent().icons.remove(self)
                 self.deleteLater()
 
@@ -52,10 +44,9 @@ class IconWidget(QWidget):
 
     def mouseDoubleClickEvent(self, event):
         if self.kind == "directory": 
-            self.go_deeper.emit(os.path.join(self.path, self.name))
+            self.new_window.emit(os.path.join(self.path, self.name))
 
     def iconRender(self, path, name):
-        # if os.path.isdir(name):
         if os.path.isdir(os.path.join(path, name)):
             self.setIcon(QPixmap("./images/folder.png"))
             self.kind = "directory"
