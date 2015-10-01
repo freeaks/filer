@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import Qt, QPoint, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QMenu
 from IconWidget import IconWidget
 import os
 
@@ -62,9 +62,27 @@ class DragWidget(QWidget):
             self.updateScrollArea()
 
     def mousePressEvent(self, event):
-        for item in self.icons:
-            item.IconSelect(False)
+        if event.buttons() == Qt.LeftButton:
+            for item in self.icons:
+                item.IconSelect(False)
+        if event.buttons() == Qt.RightButton:
+            menu = QMenu("Window Menu")
+            clean = menu.addAction("Clean Up")
+            clean.triggered.connect(self.clean_up)
+            paste = menu.addAction("Paste")
+            paste.triggered.connect(self.paste_icon)
+            eventpos = event.screenPos()
+            qpoint = QPoint(eventpos.x(), eventpos.y())
+            menu.exec_(qpoint)
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click") 
         self.query.emit()
+
+    def clean_up(self):
+        print("clean_up method")
+        pass
+
+    def paste_icon(self):
+        print("paste method")
+        pass

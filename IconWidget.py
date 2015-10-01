@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QPixmap, QPalette, QDrag
-from PyQt5.QtCore import Qt, QByteArray, QMimeData, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel 
+from PyQt5.QtCore import Qt, QByteArray, QMimeData, QPoint, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QMenu 
 import os
 
 
@@ -22,28 +22,6 @@ class IconWidget(QWidget):
         self.selected = False
         self.layout.addWidget(self.icon)
         self.layout.addWidget(self.text)
-
-    def mouseMoveEvent(self, event):
-        # if the left mouse button is used
-        if event.buttons() == Qt.LeftButton:
-            data = QByteArray()
-            mime_data = QMimeData()
-            mime_data.setData(self.mimetext, data)
-            drag = QDrag(self) 
-            drag.setMimeData(mime_data)
-            drag.setHotSpot(self.rect().topLeft())  # where do we drag from
-            if drag.exec_(Qt.MoveAction):
-                self.parent().icons.remove(self)
-                self.deleteLater()
-
-    def mousePressEvent(self, event):
-        for item in self.parent().icons:
-            item.IconSelect(False)
-        self.IconSelect(True)
-
-    def mouseDoubleClickEvent(self, event):
-        if self.kind == "directory": 
-            self.new_window.emit(os.path.join(self.path, self.name))
 
     def iconRender(self, path, name):
         if os.path.isdir(os.path.join(path, name)):
@@ -82,3 +60,44 @@ class IconWidget(QWidget):
         palette = QPalette()
         palette.setColor(QPalette.Foreground, Qt.black)
         self.text.setPalette(palette)
+
+    def mouseMoveEvent(self, event):
+        # if the left mouse button is used
+        if event.buttons() == Qt.LeftButton:
+            data = QByteArray()
+            mime_data = QMimeData()
+            mime_data.setData(self.mimetext, data)
+            drag = QDrag(self) 
+            drag.setMimeData(mime_data)
+            drag.setHotSpot(self.rect().topLeft())  # where do we drag from
+            if drag.exec_(Qt.MoveAction):
+                self.parent().icons.remove(self)
+                self.deleteLater()
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            for item in self.parent().icons:
+                item.IconSelect(False)
+            self.IconSelect(True)
+        if event.buttons() == Qt.RightButton:
+            menu = QMenu("Icon Menu")
+            copy = menu.addAction("Copy")
+            copy.triggered.connect(self.copy_icon)
+            delete = menu.addAction("Delete")
+            delete.triggered.connect(self.delete_icon)
+            eventpos = event.screenPos()
+            qpoint = QPoint(eventpos.x(), eventpos.y())
+            menu.exec_(qpoint)
+
+    def mouseDoubleClickEvent(self, event):
+        if self.kind == "directory": 
+            self.new_window.emit(os.path.join(self.path, self.name))
+
+    def copy_icon(self):
+        print("copy_icon method")
+        pass
+
+    def delete_icon(self):
+        print("delete_icon method")
+        pass
+
