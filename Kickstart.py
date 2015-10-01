@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QScrollArea, QWidget
 from DragWidget import DragWidget
 import sys
+import os
 
 
 class Window(QWidget):
@@ -56,7 +57,7 @@ class Window(QWidget):
                 item.deleteLater()
 
     def on_make_new_window(self, path):
-        Window.child_windows.append(Window(path))
+        Window.child_windows.append(Window(os.path.realpath(path)))
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window
@@ -70,5 +71,5 @@ class Window(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Window('./')
+    window = Window(os.path.realpath("./"))
     sys.exit(app.exec_())

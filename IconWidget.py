@@ -2,10 +2,12 @@ from PyQt5.QtGui import QPixmap, QPalette, QDrag
 from PyQt5.QtCore import Qt, QByteArray, QMimeData, QPoint, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QMenu 
 import os
+# import shutil
 
 
 class IconWidget(QWidget):
     new_window = pyqtSignal(str)
+    clipboard = pyqtSignal(object)
 
     def __init__(self, parent=None, name="None", path="None"):
         super().__init__(parent)
@@ -95,9 +97,9 @@ class IconWidget(QWidget):
 
     def copy_icon(self):
         print("copy_icon method")
+        self.clipboard.emit(self)
         pass
 
     def delete_icon(self):
         print("delete_icon method")
         pass
-

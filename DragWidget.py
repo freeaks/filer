@@ -2,11 +2,13 @@ from PyQt5.QtCore import Qt, QPoint, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QMenu
 from IconWidget import IconWidget
 import os
+import shutil
 
 
 class DragWidget(QWidget):
     spacerX = 16
     spacerY = 16
+    clipicon = None
     windowclass_signal = pyqtSignal(str)
     query = pyqtSignal()
 
@@ -16,10 +18,11 @@ class DragWidget(QWidget):
         self.setAcceptDrops(True)
         self.path = path
         self.icons = []
-        self.temp_drop = ""
+        # self.clipicon = None
         for name in os.listdir(path):
             icon_widget = IconWidget(self, name=name, path=self.path)
             icon_widget.new_window.connect(self.windowclass_signal.emit)
+            icon_widget.clipboard.connect(self.on_clipboard)
             self.icons.append(icon_widget)
             self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
@@ -69,8 +72,9 @@ class DragWidget(QWidget):
             menu = QMenu("Window Menu")
             clean = menu.addAction("Clean Up")
             clean.triggered.connect(self.clean_up)
-            paste = menu.addAction("Paste")
-            paste.triggered.connect(self.paste_icon)
+            if DragWidget.clipicon is not None:
+                paste = menu.addAction("Paste")
+                paste.triggered.connect(self.paste_icon)
             eventpos = event.screenPos()
             qpoint = QPoint(eventpos.x(), eventpos.y())
             menu.exec_(qpoint)
@@ -84,5 +88,18 @@ class DragWidget(QWidget):
         pass
 
     def paste_icon(self):
-        print("paste method")
-        pass
+        print("---")
+        print("srce=", self.clipicon.path + "/" + self.clipicon.name)
+        # print("res=", self.clipicon.path + "/" + self.clipicon.name)
+        print("dest=", self.path + "/")
+
+        # if os.path.isdir(os.path.join(self.clipicon.path, self.clipicon.name)):
+        SRCE = self.clipicon.path + "/" + self.clipicon.name
+        DEST = self.path+"/" + self.clipicon.name
+        shutil.copytree(SRCE, DEST)
+
+    def on_clipboard(self, icon):
+        print("realpath", self.path)
+        print("clip_icon_name=", icon.name)
+        DragWidget.clipicon = icon
+
