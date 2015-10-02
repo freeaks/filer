@@ -1,6 +1,5 @@
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QMenu
-from PyQt5.QtGui import QPainter, QColor
 from IconWidget import IconWidget
 import os
 import shutil
@@ -15,7 +14,7 @@ class DragWidget(QWidget):
 
     def __init__(self, path, parent=None):
         super(DragWidget, self).__init__(parent)
-        self.setMinimumSize(200, 200)
+        self.setMinimumSize(400, 200)
         self.setAcceptDrops(True)
         self.path = path
         self.icons = []
@@ -28,9 +27,9 @@ class DragWidget(QWidget):
             self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
             # initial icon placement
-            DragWidget.spacerX += 64
-            if DragWidget.spacerX + 64 > self.minimumWidth():
-                DragWidget.spacerY += 64
+            DragWidget.spacerX += 100
+            if DragWidget.spacerX + 100 > self.minimumWidth():
+                DragWidget.spacerY += 75
                 DragWidget.spacerX = 16
         # reset placement values
         DragWidget.spacerX = 16
@@ -42,8 +41,10 @@ class DragWidget(QWidget):
         iconx = []
         icony = []
         for item in self.icons:
-                iconx.append(item.x())
-                icony.append(item.y())
+
+            iconx.append(item.x())
+            icony.append(item.y())
+
         self.setMinimumWidth(max(iconx)+64)
         self.setMinimumHeight(max(icony)+64)
         pass
@@ -53,12 +54,6 @@ class DragWidget(QWidget):
 
     def dragMoveEvent(self, event):
         event.accept()
-        pixmap = event.source().mpixmap
-        # print("icon = ", pixmap)
-        # painter = QPainter(pixmap)
-        # painter.setCompositionMode(painter.CompositionMode_DestinationIn)
-        # painter.fillRect(pixmap.rect(), QColor(0, 0, 0, 127))
-        # painter.end()
 
     def dropEvent(self, event):
         event.accept()
@@ -74,7 +69,7 @@ class DragWidget(QWidget):
     def mousePressEvent(self, event):
         if event.buttons() == Qt.LeftButton:
             for item in self.icons:
-                item.IconSelect(False)
+                item.reset_selection()
 
         if event.buttons() == Qt.RightButton:
             menu = QMenu("Window Menu")
@@ -110,4 +105,3 @@ class DragWidget(QWidget):
         print("realpath", self.path)
         print("clip_icon_name=", icon.name)
         DragWidget.clipicon = icon
-
