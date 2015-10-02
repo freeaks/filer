@@ -68,6 +68,7 @@ class DragWidget(QWidget):
         if event.buttons() == Qt.LeftButton:
             for item in self.icons:
                 item.IconSelect(False)
+                
         if event.buttons() == Qt.RightButton:
             menu = QMenu("Window Menu")
             clean = menu.addAction("Clean Up")
