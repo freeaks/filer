@@ -7,7 +7,8 @@ import os
 
 class ClickableIcon(QLabel):
  
-    clicked = pyqtSignal()  
+    clicked = pyqtSignal()
+    double_clicked = pyqtSignal()
  
     def __init__(self, path=None, name=None, parent=None):
         super(ClickableIcon, self).__init__(parent)
@@ -16,7 +17,6 @@ class ClickableIcon(QLabel):
         # self.setAutoFillBackground(True)
 
     def mousePressEvent(self, event):
-
         self.clicked.emit()
         self.setAutoFillBackground(True)
         p = self.palette()
@@ -24,6 +24,12 @@ class ClickableIcon(QLabel):
         self.setPalette(p)
         print("clickedicon")
         event.accept()
+
+    def mouseDoubleClickEvent(self, event):
+        if self.kind == "directory": 
+            print("bleh")
+            self.double_clicked.emit()
+            event.accept()
 
 
 class ClickableLabel(QLabel):
@@ -61,6 +67,7 @@ class IconWidget(QWidget):
         self.text.clicked.connect(self._on_drag_started)
         self.icon = ClickableIcon(path=path, name=name)
         self.icon.clicked.connect(self._on_drag_started)
+        self.icon.double_clicked.connect(self.open_window)
         
         self.iconRender(path, name)
         self.setText(name)
@@ -72,10 +79,11 @@ class IconWidget(QWidget):
     def iconRender(self, path, name):
         if os.path.isdir(os.path.join(path, name)):
             self.setIcon(QPixmap("./images/folder.png"))
-            self.kind = "directory"
+            self.icon.kind = "directory"
+
         else:
             self.setIcon(QPixmap("./images/file.png"))
-            self.kind = "file"
+            self.icon.kind = "file"
 
     def IconSelect(self, status):
         if status:
@@ -129,6 +137,9 @@ class IconWidget(QWidget):
     def _on_drag_started(self):
         self._drag_started = True
 
+    def open_window(self):
+        self.new_window.emit(os.path.join(self.path, self.name))
+
     def mousePressEvent(self, event):
         # if event.buttons() == Qt.LeftButton: 
         #     # for item in self.parent().icons:
@@ -146,10 +157,6 @@ class IconWidget(QWidget):
             eventpos = event.screenPos()
             qpoint = QPoint(eventpos.x(), eventpos.y())
             menu.exec_(qpoint)
-
-    def mouseDoubleClickEvent(self, event):
-        if self.kind == "directory": 
-            self.new_window.emit(os.path.join(self.path, self.name))
 
     def copy_icon(self):
         print("copy_icon method")
