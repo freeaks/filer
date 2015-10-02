@@ -13,23 +13,43 @@ class ClickableIcon(QLabel):
     def __init__(self, path=None, name=None, parent=None):
         super(ClickableIcon, self).__init__(parent)
         self.selected = False
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        # self.setAutoFillBackground(True)
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed) 
 
     def mousePressEvent(self, event):
-        self.clicked.emit()
+        # event.accept()
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.yellow)
         self.setPalette(p)
-        print("clickedicon")
-        event.accept()
+
+        if event.buttons() == Qt.LeftButton: 
+            self.clicked.emit()
+            print("clickedicon")
+            
+        if event.buttons() == Qt.RightButton:
+            menu = QMenu("Icon Menu")
+            copy = menu.addAction("Copy")
+            copy.triggered.connect(self.copy_icon)
+            delete = menu.addAction("Delete")
+            delete.triggered.connect(self.delete_icon)
+            eventpos = event.screenPos()
+            qpoint = QPoint(eventpos.x(), eventpos.y())
+            menu.exec_(qpoint)
 
     def mouseDoubleClickEvent(self, event):
         if self.kind == "directory": 
             print("bleh")
             self.double_clicked.emit()
             event.accept()
+
+    def copy_icon(self):
+        print("copy_icon method")
+        self.clipboard.emit(self)
+        pass
+
+    def delete_icon(self):
+        print("delete_icon method")
+        pass
 
 
 class ClickableLabel(QLabel):
@@ -142,30 +162,3 @@ class IconWidget(QWidget):
 
     def open_window(self):
         self.new_window.emit(os.path.join(self.path, self.name))
-
-    def mousePressEvent(self, event):
-        # if event.buttons() == Qt.LeftButton: 
-        #     # for item in self.parent().icons:
-        #     #    item.icon.mousePressedButton(event)
-        #     #    item.text.mousePressedButton(event)
-        #     # self.IconSelect(True)
-        #     # self.icon.mousePressedButton(event)
-        #     pass
-        if event.buttons() == Qt.RightButton:
-            menu = QMenu("Icon Menu")
-            copy = menu.addAction("Copy")
-            copy.triggered.connect(self.copy_icon)
-            delete = menu.addAction("Delete")
-            delete.triggered.connect(self.delete_icon)
-            eventpos = event.screenPos()
-            qpoint = QPoint(eventpos.x(), eventpos.y())
-            menu.exec_(qpoint)
-
-    def copy_icon(self):
-        print("copy_icon method")
-        self.clipboard.emit(self)
-        pass
-
-    def delete_icon(self):
-        print("delete_icon method")
-        pass
