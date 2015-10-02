@@ -60,6 +60,7 @@ class IconWidget(QWidget):
         self._drag_started = False
         string_width = self.fontMetrics().boundingRect(name).width() 
         self.mimetext = "application/x-icon"
+        self.mpixmap = None
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
@@ -102,6 +103,7 @@ class IconWidget(QWidget):
 
     def setIcon(self, icon):
         self.icon.setPixmap(icon)
+        self.mpixmap = icon
 
     def getIconWidget(self):
         return self
@@ -129,6 +131,7 @@ class IconWidget(QWidget):
             mime_data.setData(self.mimetext, data)
             drag = QDrag(self) 
             drag.setMimeData(mime_data)
+            drag.setPixmap(self.mpixmap)
             drag.setHotSpot(self.rect().topLeft())  # where do we drag from
             if drag.exec_(Qt.MoveAction):
                 self.parent().icons.remove(self)

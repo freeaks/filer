@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QMenu
+from PyQt5.QtGui import QPainter, QColor
 from IconWidget import IconWidget
 import os
 import shutil
@@ -52,6 +53,12 @@ class DragWidget(QWidget):
 
     def dragMoveEvent(self, event):
         event.accept()
+        pixmap = event.source().mpixmap
+        # print("icon = ", pixmap)
+        # painter = QPainter(pixmap)
+        # painter.setCompositionMode(painter.CompositionMode_DestinationIn)
+        # painter.fillRect(pixmap.rect(), QColor(0, 0, 0, 127))
+        # painter.end()
 
     def dropEvent(self, event):
         event.accept()
@@ -68,7 +75,7 @@ class DragWidget(QWidget):
         if event.buttons() == Qt.LeftButton:
             for item in self.icons:
                 item.IconSelect(False)
-                
+
         if event.buttons() == Qt.RightButton:
             menu = QMenu("Window Menu")
             clean = menu.addAction("Clean Up")
