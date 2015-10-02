@@ -24,16 +24,9 @@ class DragWidget(QWidget):
             icon_widget.new_window.connect(self.windowclass_signal.emit)
             icon_widget.clipboard.connect(self.on_clipboard)
             self.icons.append(icon_widget)
-            self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
+            # self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
-            # initial icon placement
-            DragWidget.spacerX += 100
-            if DragWidget.spacerX + 100 > self.minimumWidth():
-                DragWidget.spacerY += 75
-                DragWidget.spacerX = 16
-        # reset placement values
-        DragWidget.spacerX = 16
-        DragWidget.spacerY = 16
+        self.clean_up()
         self.updateScrollArea()
 
     def updateScrollArea(self):
@@ -41,13 +34,10 @@ class DragWidget(QWidget):
         iconx = []
         icony = []
         for item in self.icons:
-
             iconx.append(item.x())
             icony.append(item.y())
-
-        self.setMinimumWidth(max(iconx)+64)
-        self.setMinimumHeight(max(icony)+64)
-        pass
+        self.setMinimumWidth(max(iconx)+100)
+        self.setMinimumHeight(max(icony)+75)
         
     def dragEnterEvent(self, event):
         event.accept()
@@ -88,7 +78,17 @@ class DragWidget(QWidget):
 
     def clean_up(self):
         print("clean_up method")
-        pass
+        for item in self.icons:
+            item.move(DragWidget.spacerX, DragWidget.spacerY)
+            # initial icon placement
+            DragWidget.spacerX += 100
+            if DragWidget.spacerX + 100 > self.minimumWidth():
+                DragWidget.spacerY += 75
+                DragWidget.spacerX = 16
+        # reset placement values
+        DragWidget.spacerX = 16
+        DragWidget.spacerY = 16
+        self.updateScrollArea()
 
     def paste_icon(self):
         print("---")

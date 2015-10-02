@@ -103,7 +103,7 @@ class ClickableIcon(QLabel):
 
         if event.buttons() == Qt.LeftButton: 
             self.clicked.emit()
-            print("clickedicon")
+            # print("clickedicon")
             
         if event.buttons() == Qt.RightButton:
             menu = QMenu("Icon Menu")
