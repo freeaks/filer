@@ -78,16 +78,18 @@ class DragWidget(QWidget):
 
     def clean_up(self):
         print("clean_up method")
+        DragWidget.spacerX = 16
+        DragWidget.spacerY = 16
+        print("sw=", self.window().width())
         for item in self.icons:
             item.move(DragWidget.spacerX, DragWidget.spacerY)
             # initial icon placement
             DragWidget.spacerX += 100
-            if DragWidget.spacerX + 100 > self.minimumWidth():
+            if DragWidget.spacerX + 100 > self.window().width():
                 DragWidget.spacerY += 75
                 DragWidget.spacerX = 16
         # reset placement values
-        DragWidget.spacerX = 16
-        DragWidget.spacerY = 16
+
         self.updateScrollArea()
 
     def paste_icon(self):
