@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QMenu
+from PyQt5.QtWidgets import QWidget, QMenu, QMenuBar, QAction
 from IconWidget import IconWidget
 import os
 import shutil
@@ -16,6 +16,13 @@ class DragWidget(QWidget):
         super(DragWidget, self).__init__(parent)
         self.setMinimumSize(400, 200)
         self.setAcceptDrops(True)
+        self.menubar = QMenuBar()
+        fileMenu = self.menubar.addMenu('File')
+        editMenu = self.menubar.addMenu('Edit')
+        exitAction = QAction('Open', self)
+        prefAction = QAction('Pref', self)
+        fileMenu.addAction(exitAction)
+        editMenu.addAction(prefAction)
         self.path = path
         self.icons = []
         # self.clipicon = None
@@ -27,7 +34,7 @@ class DragWidget(QWidget):
             # self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
         self.clean_up()
-        self.updateScrollArea()
+        # self.updateScrollArea()
 
     def updateScrollArea(self):
         """ set the dimension of the widget """
@@ -36,7 +43,7 @@ class DragWidget(QWidget):
         for item in self.icons:
             iconx.append(item.x())
             icony.append(item.y())
-        self.setMinimumWidth(max(iconx)+100)
+        self.setMinimumWidth(max(iconx)+75)
         self.setMinimumHeight(max(icony)+75)
         
     def dragEnterEvent(self, event):
@@ -78,9 +85,7 @@ class DragWidget(QWidget):
 
     def clean_up(self):
         print("clean_up method")
-        DragWidget.spacerX = 16
-        DragWidget.spacerY = 16
-        print("sw=", self.window().width())
+        # print("sw=", self.window().width())
         for item in self.icons:
             item.move(DragWidget.spacerX, DragWidget.spacerY)
             # initial icon placement
@@ -89,7 +94,8 @@ class DragWidget(QWidget):
                 DragWidget.spacerY += 75
                 DragWidget.spacerX = 16
         # reset placement values
-
+        DragWidget.spacerX = 16
+        DragWidget.spacerY = 16
         self.updateScrollArea()
 
     def paste_icon(self):

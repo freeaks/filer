@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from PyQt5.QtGui import QPalette, QBrush, QPixmap 
+from PyQt5.QtGui import QPalette, QBrush, QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QScrollArea, QWidget
 from DragWidget import DragWidget
@@ -71,5 +71,5 @@ class Window(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Window(os.path.realpath("./"))
+    window = Window(os.path.realpath("/"))
     sys.exit(app.exec_())

@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QPixmap, QDrag
-from PyQt5.QtCore import Qt, QByteArray, QMimeData, QPoint, pyqtSignal
+from PyQt5.QtCore import Qt, QByteArray, QMimeData, QPoint, pyqtSignal, QProcess
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QMenu, QSizePolicy 
 import os
 # import shutil
@@ -80,13 +80,22 @@ class ClickableIcon(QLabel):
         self.path = path
         self.icon = None
         self.kind = self.parent().kind
-        self.select_icon()
+        self.select_icon(name)
 
-    def select_icon(self):
+    def select_icon(self, name):
         if self.kind == "directory":
             self.set_icon(QPixmap("./images/folder.png"))
         else:
-            self.set_icon(QPixmap("./images/file.png"))
+            if name.lower().endswith(('.zip', '.rar', '.lha', 'tar.gz')):
+                self.set_icon(QPixmap("./images/archive.png"))
+            elif name.lower().endswith(('.dmg', '.iso')):
+                self.set_icon(QPixmap("./images/cdfile.png"))
+            elif name.lower().endswith(('.avi', '.mp4', '.mov')):
+                self.set_icon(QPixmap("./images/anim.png"))
+            elif name.lower().endswith(('.txt', '.md')):
+                self.set_icon(QPixmap("./images/file.png"))
+            else:
+                self.set_icon(QPixmap("./images/file.png"))
             # make more test on file.ext
             # to assign different icons
 
@@ -117,8 +126,11 @@ class ClickableIcon(QLabel):
 
     def mouseDoubleClickEvent(self, event):
         if self.kind == "directory":
-
             self.double_clicked.emit()
+        else:
+            print("execute=", os.path.join(self.path, self.name))
+            file = "\"" + os.path.join(self.path, self.name) + "\""
+            QProcess.execute("/usr/bin/open " + file)
             # event.accept()
 
     def copy_icon(self):
