@@ -5,6 +5,7 @@ from PyQt5.QtCore import (Qt, QByteArray, QMimeData,
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, 
                              QMenu, QSizePolicy)
 import os
+import configparser
 # import shutil
 
 
@@ -160,6 +161,13 @@ class ClickableLabel(QLabel):
         self.name = name
         self.path = path
         self.set_name(name)
+        # self.property
+        config = configparser.ConfigParser()
+        config.read('prefs.cfg')
+        self.color = config.get("colors", "label")
+        self.setStyleSheet("""QLabel{color:""" +
+                           self.color +
+                           """;}""")
 
     def set_name(self, name):
         temp_name = None

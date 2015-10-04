@@ -15,6 +15,7 @@ class Window(QWidget):
     def __init__(self, path, parent=None):
         super(Window, self).__init__()
         self.setWindowTitle(path)
+        # self.pattern = "images/pattern.png"
         self.pattern = "images/pattern.png"
         self.path = path
         self.widget = QWidget()
