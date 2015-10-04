@@ -1,6 +1,9 @@
+
 from PyQt5.QtGui import QPixmap, QDrag
-from PyQt5.QtCore import Qt, QByteArray, QMimeData, QPoint, pyqtSignal, QProcess
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QMenu, QSizePolicy 
+from PyQt5.QtCore import (Qt, QByteArray, QMimeData, 
+                          QPoint, pyqtSignal, QProcess)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, 
+                             QMenu, QSizePolicy)
 import os
 # import shutil
 
@@ -94,6 +97,8 @@ class ClickableIcon(QLabel):
                 self.set_icon(QPixmap("./images/anim.png"))
             elif name.lower().endswith(('.txt', '.md')):
                 self.set_icon(QPixmap("./images/file.png"))
+            elif name.lower().endswith(('.png', '.jpg', '.tiff')):
+                self.set_icon(QPixmap("./images/picture.png"))                
             else:
                 self.set_icon(QPixmap("./images/file.png"))
             # make more test on file.ext
@@ -112,7 +117,7 @@ class ClickableIcon(QLabel):
 
         if event.buttons() == Qt.LeftButton: 
             self.clicked.emit()
-            # print("clickedicon")
+            print("clickedicon=", self.name)
             
         if event.buttons() == Qt.RightButton:
             menu = QMenu("Icon Menu")
@@ -128,7 +133,7 @@ class ClickableIcon(QLabel):
         if self.kind == "directory":
             self.double_clicked.emit()
         else:
-            print("execute=", os.path.join(self.path, self.name))
+            print("execute =", os.path.join(self.path, self.name))
             file = "\"" + os.path.join(self.path, self.name) + "\""
             QProcess.execute("/usr/bin/open " + file)
             # event.accept()
@@ -157,7 +162,6 @@ class ClickableLabel(QLabel):
         self.set_name(name)
 
     def set_name(self, name):
-        self.string_width = self.fontMetrics().boundingRect(name).width()
         temp_name = None
         label_length = len(name)
         if label_length > 11:

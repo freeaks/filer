@@ -71,5 +71,5 @@ class Window(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Window(os.path.realpath("/"))
+    window = Window(os.path.realpath("/Users/freeaks/"))
     sys.exit(app.exec_())
