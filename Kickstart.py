@@ -34,16 +34,7 @@ class Window(QWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.widget)
-        self.setStyleSheet("""
-            QScrollBar:vertical { border:none; width:6px }
-            QScrollBar::handle:vertical { background: lightgray; }
-            QScrollBar::add-line:vertical { background: none; }
-            QScrollBar::sub-line:vertical { background: none; }
-            QScrollBar:horizontal { border:none; height:6px }
-            QScrollBar::handle:horizontal { background: lightgray; }
-            QScrollBar::add-line:horizontal { background: none; }
-            QScrollBar::sub-line:horizontal { background: none; }
-            """)
+
         vlayout = QVBoxLayout(self)
         vlayout.setContentsMargins(0, 0, 0, 0)
         vlayout.setSpacing(0)
