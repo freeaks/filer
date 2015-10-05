@@ -8,7 +8,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import(
     QWidget, QListWidget,
     QLabel, QVBoxLayout, QHBoxLayout, QFormLayout,
-    QListWidgetItem, QGroupBox, QButtonGroup, 
+    QListWidgetItem, QGroupBox, QButtonGroup, QColorDialog,
     QApplication, QLineEdit, QPushButton, QRadioButton, QSizePolicy)
 
 
@@ -64,13 +64,17 @@ class exampleQMainWindow (QWidget):
         self.filename = QLineEdit()
         self.add_type = QPushButton("add type")
         self.del_type = QPushButton("del type")
+        self._color = "blue"
+        self.color_button = QPushButton()
+        self.color_button.setStyleSheet("background-color: %s;" % self._color)
+        self.color_button.setMaximumSize(40, 30)
         self.pattern_label = QLabel()
         self.pattern_icon = QLabel()
         self.radio_button_one = QRadioButton('Classic')
         self.radio_button_two = QRadioButton('Magellan')
         self.radio_group = QGroupBox('operation mode')
         self.radio_group.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.pattern_group = QGroupBox('window pattern')
+        self.pattern_group = QGroupBox('window pattern and text color')
         self.pattern_group.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         self.button_group = QButtonGroup()
@@ -82,7 +86,7 @@ class exampleQMainWindow (QWidget):
         self.mainlayout = QVBoxLayout()
         self.holdgroups_layout = QHBoxLayout()
         self.radio_button_layout = QVBoxLayout()
-        self.pattern_label_layout = QVBoxLayout()
+        self.pattern_label_layout = QHBoxLayout()
         self.add_filetype_layout = QFormLayout()
         self.add_del_button_layout = QHBoxLayout()
 
@@ -91,6 +95,9 @@ class exampleQMainWindow (QWidget):
         self.holdgroups_layout.addWidget(self.pattern_group)
 
         self.pattern_label_layout.addWidget(self.pattern_icon)
+        self.pattern_label_layout.addStretch(1)
+        self.pattern_label_layout.addWidget(self.color_button)
+        self.pattern_label_layout.addStretch(1)
         self.pattern_group.setLayout(self.pattern_label_layout)
 
         self.radio_button_layout.addWidget(self.radio_button_one)
@@ -128,7 +135,13 @@ class exampleQMainWindow (QWidget):
         self.mainlayout.addLayout(self.add_del_button_layout)
         self.setLayout(self.mainlayout) 
 
+    def onColorPicker(self):
+        dlg = QColorDialog(self)
+        dlg.exec_()
+        pass
+
 app = QApplication([])
 window = exampleQMainWindow()
 window.show()
+window.onColorPicker()
 sys.exit(app.exec_())
