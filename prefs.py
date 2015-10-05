@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import(
     QWidget, QListWidget,
     QLabel, QVBoxLayout, QHBoxLayout, QFormLayout,
     QListWidgetItem, QGroupBox, QButtonGroup, 
-    QApplication, QLineEdit, QPushButton, QRadioButton)
+    QApplication, QLineEdit, QPushButton, QRadioButton, QSizePolicy)
 
 
 class QCustomQWidget (QWidget):
@@ -69,7 +69,9 @@ class exampleQMainWindow (QWidget):
         self.radio_button_one = QRadioButton('Classic')
         self.radio_button_two = QRadioButton('Magellan')
         self.radio_group = QGroupBox('operation mode')
+        self.radio_group.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.pattern_group = QGroupBox('window pattern')
+        self.pattern_group.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         self.button_group = QButtonGroup()
         self.button_group.addButton(self.radio_button_one)
