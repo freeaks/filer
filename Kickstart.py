@@ -16,7 +16,7 @@ class Window(QWidget):
         super(Window, self).__init__()
         self.setWindowTitle(path)
         # self.pattern = "images/pattern.png"
-        self.pattern = "images/pattern.png"
+        self.pattern = os.path.dirname(os.path.realpath(__file__)) + "/images/pattern7.png"
         self.path = path
         self.widget = QWidget()
         self.palette = QPalette()
@@ -72,5 +72,5 @@ class Window(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Window(os.path.realpath("/Users/freeaks/"))
+    window = Window(os.path.abspath(os.path.expanduser("~")))
     sys.exit(app.exec_())

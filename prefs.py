@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import configparser
-from PyQt5.QtCore import QRect
+# from PyQt5.QtCore import QRect
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import(
     QWidget, QListWidget,
@@ -111,7 +112,7 @@ class exampleQMainWindow (QWidget):
             myQCustomQWidget = QCustomQWidget()
             myQCustomQWidget.setTextUp("filetype: " + key.upper())
             myQCustomQWidget.setTextDown(value)
-            myQCustomQWidget.setIcon(value)
+            myQCustomQWidget.setIcon(os.path.dirname(os.path.realpath(__file__)) + value)
             myQListWidgetItem = QListWidgetItem(self.myQListWidget) 
             myQListWidgetItem.setSizeHint(myQCustomQWidget.sizeHint()) 
             self.myQListWidget.addItem(myQListWidgetItem)
