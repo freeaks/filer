@@ -6,7 +6,7 @@ preference program: prefs.py
 asl requester program: requester.py
 
 
-![Alt text](https://raw.githubusercontent.com/freeaks/filer/master/test-tree/screenshots/filer.png "Optional title")
+![Alt text](https://github.com/freeaks/filer/blob/master/test-tree/screenshots/filer.png "Optional title")
 
 current status:   
 alpha. most of it remains to be writen yet.
