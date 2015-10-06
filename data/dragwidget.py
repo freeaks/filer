@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QMenu, QMenuBar, QAction
-from IconWidget import IconWidget
+from PyQt5.QtWidgets import QWidget, QMenu
+from iconwidget import IconWidget
 import os
 import shutil
 
@@ -16,13 +16,7 @@ class DragWidget(QWidget):
         super(DragWidget, self).__init__(parent)
         self.setMinimumSize(400, 200)
         self.setAcceptDrops(True)
-        self.menubar = QMenuBar()
-        fileMenu = self.menubar.addMenu('File')
-        editMenu = self.menubar.addMenu('Edit')
-        exitAction = QAction('Open', self)
-        prefAction = QAction('Pref', self)
-        fileMenu.addAction(exitAction)
-        editMenu.addAction(prefAction)
+
         self.path = path
         self.icons = []
         # self.clipicon = None

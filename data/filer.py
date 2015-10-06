@@ -2,11 +2,13 @@
 
 from PyQt5.QtGui import QPalette, QBrush, QPixmap
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QVBoxLayout, QScrollArea, QWidget
-from DragWidget import DragWidget
+from PyQt5.QtWidgets import(
+    QApplication, QVBoxLayout, QScrollArea, QWidget)
+from dragwidget import DragWidget
 import sys
 import os
 import configparser
+from globalmenu import GlobalMenu
 
 
 class Window(QWidget):
@@ -63,7 +65,12 @@ class Window(QWidget):
             print("loop child_window=", type(
                 item), "title=", item.windowTitle())
 
-if __name__ == '__main__':
+
+def main():
     app = QApplication(sys.argv)
     window = Window(os.path.abspath(os.path.expanduser("~")))
+    menu = GlobalMenu()
     sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
