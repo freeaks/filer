@@ -3,12 +3,12 @@
 import sys
 import os
 import configparser
-# from PyQt5.QtCore import QRect
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import(
     QWidget, QListWidget,
-    QLabel, QVBoxLayout, QHBoxLayout, QFormLayout,
-    QListWidgetItem, QGroupBox, QButtonGroup, QColorDialog,
+    QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QFrame,
+    QListWidgetItem, QGroupBox, QButtonGroup, QColorDialog, QFileDialog,
     QApplication, QLineEdit, QPushButton, QRadioButton, QSizePolicy)
 
 
@@ -57,19 +57,15 @@ class exampleQMainWindow (QWidget):
             """)
 
         self.setMinimumSize(350, 500)
-        config = configparser.ConfigParser()
-        config.read('prefs.cfg')
+        self.config = configparser.ConfigParser()
+        self.config.read('prefs.cfg')
 
         self.extention = QLineEdit()
         self.filename = QLineEdit()
         self.add_type = QPushButton("add type")
         self.del_type = QPushButton("del type")
-        self._color = "blue"
-        self.color_button = QPushButton()
-        self.color_button.setStyleSheet("background-color: %s;" % self._color)
-        self.color_button.setMaximumSize(40, 30)
-        self.pattern_label = QLabel()
-        self.pattern_icon = QLabel()
+        self.color_button = color_picker(parent=self)
+        self.pattern_icon = Pattern_button(parent=self)
         self.radio_button_one = QRadioButton('Classic')
         self.radio_button_two = QRadioButton('Magellan')
         self.radio_group = QGroupBox('operation mode')
@@ -112,12 +108,12 @@ class exampleQMainWindow (QWidget):
         # layouts settings 
         # self.radio_button_layout.setGeometry(QRect(10, 10, 10, 10))
         self.add_filetype_layout.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
-        self.pattern_icon.setPixmap(QPixmap("./images/pattern.png").scaledToWidth(80)) 
+        # self.pattern_icon.setPixmap(QPixmap("./images/pattern.png").scaledToWidth(80)) 
         self.mainlayout.setContentsMargins(5, 5, 5, 0)
         self.mainlayout.setSpacing(7)   
 
         # reading stored settings
-        for key, value in config.items('icons'):
+        for key, value in self.config.items('icons'):
             myQCustomQWidget = QCustomQWidget()
             myQCustomQWidget.setTextUp("filetype: " + key.upper())
             myQCustomQWidget.setTextDown(value)
@@ -135,13 +131,57 @@ class exampleQMainWindow (QWidget):
         self.mainlayout.addLayout(self.add_del_button_layout)
         self.setLayout(self.mainlayout) 
 
-    def onColorPicker(self):
-        dlg = QColorDialog(self)
-        dlg.exec_()
+
+class Pattern_button(QLabel):
+
+    def __init__(self, parent=None):
+        super(Pattern_button, self).__init__()
+        # self.set_image("./images/pattern.png")
+        self.parent = parent
+        self.image = self.set_image(parent.config.get("background", "file"))
+        self.setFrameShape(QFrame.Panel)
+        self.setFrameShadow(QFrame.Raised)
+        # self.setPixmap(QPixmap("./images/pattern.png").scaledToWidth(80))
         pass
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton: 
+            fileName = QFileDialog.getOpenFileName(self, 'Title', './', filter='*.png')
+            self.set_image(fileName[0])
+
+    def set_image(self, image):
+        self.setPixmap(QPixmap(image).scaledToWidth(80))
+        self.parent.config.set('background', 'file', image)
+        pref_file = open('prefs.cfg', 'w')
+        self.parent.config.write(pref_file)
+        pref_file.close()
+
+
+class color_picker(QPushButton):
+
+    def __init__(self, parent=None):
+        super(color_picker, self).__init__()
+        self.parent = parent
+        self.color = self.set_color(parent.config.get("colors", "label"))
+        self.setMaximumSize(40, 30)
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            self.onColorPicker()
+    
+    def set_color(self, color):
+        self.color = color
+        self.setStyleSheet("background-color: %s;" % self.color)
+        self.parent.config.set('colors', 'label', self.color)
+        pref_file = open('prefs.cfg', 'w')
+        self.parent.config.write(pref_file)
+        pref_file.close()
+
+    def onColorPicker(self):
+        color = QColorDialog.getColor().name() 
+        self.set_color(color)
 
 app = QApplication([])
 window = exampleQMainWindow()
 window.show()
-window.onColorPicker()
 sys.exit(app.exec_())

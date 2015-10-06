@@ -6,17 +6,20 @@ from PyQt5.QtWidgets import QApplication, QVBoxLayout, QScrollArea, QWidget
 from DragWidget import DragWidget
 import sys
 import os
+import configparser
 
 
 class Window(QWidget):
 
     child_windows = []
+    pattern = None
 
     def __init__(self, path, parent=None):
         super(Window, self).__init__()
+        self.config = configparser.ConfigParser()
+        self.config.read('prefs.cfg')
         self.setWindowTitle(path)
-        # self.pattern = "images/pattern.png"
-        self.pattern = os.path.dirname(os.path.realpath(__file__)) + "/images/pattern7.png"
+        Window.pattern = self.config.get("background", "file")
         self.path = path
         self.widget = QWidget()
         self.palette = QPalette()
@@ -34,16 +37,6 @@ class Window(QWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.widget)
-        self.setStyleSheet("""
-            QScrollBar:vertical { border:none; width:6px }
-            QScrollBar::handle:vertical { background: lightgray; }
-            QScrollBar::add-line:vertical { background: none; }
-            QScrollBar::sub-line:vertical { background: none; }
-            QScrollBar:horizontal { border:none; height:6px }
-            QScrollBar::handle:horizontal { background: lightgray; }
-            QScrollBar::add-line:horizontal { background: none; }
-            QScrollBar::sub-line:horizontal { background: none; }
-            """)
         vlayout = QVBoxLayout(self)
         vlayout.setContentsMargins(0, 0, 0, 0)
         vlayout.setSpacing(0)
