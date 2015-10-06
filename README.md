@@ -1,8 +1,12 @@
 attempt at writing a file manager in pyqt,   
 with heavy influences from the Amiga Workbench and Directory Opus 5
 
-file manager is started with Kickstart.py   
-preference program is started with prefs.py   
+file manager: Kickstart.py   
+preference program: prefs.py   
+asl requester program: requester.py
+
+
+![Alt text](https://raw.githubusercontent.com/freeaks/filer/master/test-tree/screenshots/filer.png "Optional title")
 
 current status:   
 alpha. most of it remains to be writen yet.
