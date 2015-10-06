@@ -14,8 +14,8 @@ todo:
 
 prefs program:   
 - adding and removing new icons (for filetypes)   
-- activate the 'operation mode' selection   
-  (switch between classic and dopus5 behavior)   
+- activate the 'operation mode' selection (classic / dopus5 behavior)   
+
 
 file manager:   
 - adding more operations file operations (copy, deleting, moving etc)   
