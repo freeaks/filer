@@ -7,8 +7,9 @@ preference program is started with prefs.py
 current status:   
 alpha. most of it remains to be writen yet.
 
+
 todo:   
-write an amia style asl file requester
+write an amiga style asl file requester
 
 prefs program:   
 - adding and removing new icons (for filetypes)   
