@@ -11,7 +11,6 @@ alpha. most of it remains to be writen yet.
 
 
 todo:   
-write an amiga style asl file requester
 
 prefs program:   
 - adding and removing new icons (for filetypes)   
@@ -22,3 +21,10 @@ file manager:
 - adding more operations file operations (copy, deleting, moving etc)   
 - implement some more menu items   
 - create a dopus5 like file lister   
+
+file requester:   
+- add options for path or file opening   
+
+
+
+
