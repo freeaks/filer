@@ -5,6 +5,7 @@ file manager: Kickstart.py
 preference program: prefs.py   
 asl requester program: requester.py
 
+![ScreenShot](https://raw.github.com/freeaks/filer/master/test-tree/screenshots/filer.png)
 
 ![alt tag](https://github.com/freeaks/filer/blob/master/test-tree/screenshots/filer.png)
 
