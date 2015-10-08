@@ -15,11 +15,14 @@ class Window(QWidget):
 
     child_windows = []
     pattern = None
+    menu = None
 
     def __init__(self, path, parent=None):
         super(Window, self).__init__()
         self.config = configparser.ConfigParser()
         self.config.read('prefs.cfg')
+        if Window.menu is None:
+            Window.menu = GlobalMenu()
         self.setWindowTitle(path)
         Window.pattern = self.config.get("background", "file")
         self.path = path
@@ -69,7 +72,6 @@ class Window(QWidget):
 def main():
     app = QApplication(sys.argv)
     window = Window(os.path.abspath(os.path.expanduser("~")))
-    menu = GlobalMenu()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

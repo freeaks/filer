@@ -1,5 +1,7 @@
 
 from PyQt5.QtWidgets import QWidget, QMenuBar, QAction
+import sys
+import subprocess
 
 
 class GlobalMenu(QWidget):
@@ -22,6 +24,9 @@ class GlobalMenu(QWidget):
         create_drawer_action = QAction('Create drawer', self)
         delete_action = QAction('Delete', self)
 
+        quit_action.triggered.connect(self.quit_action)
+        preferences_action.triggered.connect(self.preferences_action)
+
         file_menu.addAction(open_file_action)
         file_menu.addAction(open_drawer_action)
         file_menu.addAction(open_parent_action)
@@ -32,4 +37,11 @@ class GlobalMenu(QWidget):
         edit_menu.addAction(copy_action)
         edit_menu.addAction(paste_action)
         edit_menu.addAction(delete_action)
-        pass
+
+    def quit_action(self):
+        print("quiting")
+        sys.exit(0)
+
+    def preferences_action(self):
+        print("calling prefs")
+        subprocess.Popen("./prefs.py")
