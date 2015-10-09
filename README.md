@@ -10,21 +10,23 @@ current status:
 alpha. most of it remains to be writen yet.
 
 
-todo:   
+done:   
+---
+- file requester: browse filesystem, open directory or execute file   
+- file manager: display files, reordering, dragndrop, copy, execute   
+- preferences: choose pattern, font color   
+- global menu: open requester, preferences, quit   
 
-prefs program:   
+todo:   
+---   
+preferences:   
 - adding and removing new icons (for filetypes)   
 - activate the 'operation mode' selection (classic / dopus5 behavior)   
 
-
 file manager:   
-- adding more operations file operations (copy, deleting, moving etc)   
+- adding more file operations (copy, deleting, moving, renaming etc)   
 - implement some more menu items   
 - create a dopus5 like file lister   
-
-file requester:   
-- add options for path or file opening   
-
-
+- create icon info window   
 
 
