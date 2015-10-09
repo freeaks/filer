@@ -2,6 +2,7 @@
 
 import sys
 import os
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import(
     QApplication, QWidget, QLabel, QPushButton, QVBoxLayout,
     QHBoxLayout, QFormLayout, QListWidget, QListWidgetItem,
@@ -13,18 +14,21 @@ class requester(QWidget):
     def __init__(self):
         super(requester, self).__init__()
         self.path = "/"
-        self.QVBoxLayout = QVBoxLayout()
+        self.main_Layout = QVBoxLayout()
         self.button_layout = QHBoxLayout()
         self.form_layout = QFormLayout()
         self.form_layout.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
-        self.QVBoxLayout.setContentsMargins(5, 5, 5, 5)
-        self.QVBoxLayout.setSpacing(5)
+        self.main_Layout.setContentsMargins(5, 5, 5, 5)
+        self.main_Layout.setSpacing(5)
         self.myQListWidget = QListWidget(self)
-        self.create_list()
+        self.myQListWidget.setStyleSheet("""
+            QListWidget:item:selected:active {
+            background-color:#A6A4FF;}
+            """)
 
         self.ok_button = ok_button(parent=self)
-        self.volumes_button = volumes_button()
-        self.parent_button = parent_button()
+        self.volumes_button = volumes_button(parent=self)
+        self.parent_button = parent_button(parent=self)
         self.cancel_button = cancel_button()
 
         self.drawer_field = drawer_field()
@@ -38,38 +42,70 @@ class requester(QWidget):
         self.button_layout.addWidget(self.parent_button)
         self.button_layout.addWidget(self.cancel_button)
 
-        self.QVBoxLayout.addWidget(self.myQListWidget)
-        self.QVBoxLayout.addLayout(self.form_layout)
-        self.QVBoxLayout.addLayout(self.button_layout)
-        self.setLayout(self.QVBoxLayout) 
+        self.main_Layout.addWidget(self.myQListWidget)
+        self.main_Layout.addLayout(self.form_layout)
+        self.main_Layout.addLayout(self.button_layout)
+        self.setLayout(self.main_Layout)
+        self.create_list(self.path)
 
-    def create_list(self):
-        for item in os.listdir(self.path):
+    def create_list(self, path):
+        self.myQListWidget.clear()
+        for item in os.listdir(path):
             # print(item)
-            if os.path.isdir(os.path.join(self.path, item)):
-                self.myQCustomQWidget = QCustomQWidget(name=item, kind="directory")
-            else:
-                self.myQCustomQWidget = QCustomQWidget(name=item, kind="file")
-            # myQListWidget = QListWidget(self)
-            myQListWidgetItem = QListWidgetItem(self.myQListWidget)
-            self.myQListWidget.addItem(myQListWidgetItem)
-            self.myQListWidget.setItemWidget(myQListWidgetItem, self.myQCustomQWidget)
+            if os.path.isdir(os.path.join(path, item)):
+                self.myQCustomQWidget = QCustomQWidget(name=item,
+                                                       kind="Drawer",
+                                                       path=path,
+                                                       parent=self)
+                myQListWidgetItem = QListWidgetItem(self.myQListWidget)
+                myQListWidgetItem.setSizeHint(self.myQCustomQWidget.sizeHint())
+                self.myQListWidget.addItem(myQListWidgetItem)
+                self.myQListWidget.setItemWidget(myQListWidgetItem, self.myQCustomQWidget)
+        for item in os.listdir(path):
+            if os.path.isfile(os.path.join(path, item)):
+                self.myQCustomQWidget = QCustomQWidget(name=item,
+                                                       kind="file", 
+                                                       path=path, 
+                                                       parent=self)
+                myQListWidgetItem = QListWidgetItem(self.myQListWidget)
+                myQListWidgetItem.setSizeHint(self.myQCustomQWidget.sizeHint())
+                self.myQListWidget.addItem(myQListWidgetItem)
+                self.myQListWidget.setItemWidget(myQListWidgetItem, self.myQCustomQWidget)
 
 
-class QCustomQWidget (QLabel):
+class QCustomQWidget (QWidget):
 
-    def __init__(self, name=None, kind=None, parent=None):
+    def __init__(self, name=None, kind=None, path=None, parent=None):
         super(QCustomQWidget, self).__init__(parent)
+        self.path = path
+        self.parent = parent
+        self.file_layout = QHBoxLayout()
+        self.file_layout.setContentsMargins(5, 5, 5, 0)
+        # self.file_layout.setSpacing(10)
+        self.name_label = QLabel("")
+        self.kind_label = QLabel("")
+        self.kind_label.setAlignment(Qt.AlignRight)
+        self.file_layout.addWidget(self.name_label)
+        self.file_layout.addWidget(self.kind_label)
+        self.file_layout.addSpacing(5)
+        self.setLayout(self.file_layout)
         self.kind = kind
-        self.text = name
+        self.name = name
         self.set_text(name)
 
     def set_text(self, text):
-        if self.kind == "directory":
+        if self.kind == "Drawer":
             self.setStyleSheet('''color: rgb(0, 0, 255);''')
+            self.kind_label.setText(self.kind)
         else:
             self.setStyleSheet('''color: rgb(0, 0, 0);''')        
-        self.setText(text)
+        self.name_label.setText(self.name)
+
+    def mouseDoubleClickEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            # print("path=", self.path)
+            self.parent.path = self.path
+            self.parent.create_list(path=os.path.join(self.path, self.name))
 
 
 class drawer_field(QLineEdit):
@@ -98,14 +134,26 @@ class volumes_button(QPushButton):
 
     def __init__(self, name=None, kind=None, parent=None):
         super(volumes_button, self).__init__(parent)
+        self.parent = parent
         self.setText("Volumes")
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            self.parent.create_list(path="/Volumes/")
 
 
 class parent_button(QPushButton):
 
-    def __init__(self, name=None, kind=None, parent=None):
+    def __init__(self, name=None, kind=None, path=None, parent=None):
         super(parent_button, self).__init__(parent)
+        self.parent = parent
+        self.path = path
         self.setText("Parent")
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            # print(self.parent.path)
+            self.parent.create_list(path=self.parent.path)
 
 
 class cancel_button(QPushButton):
@@ -113,6 +161,10 @@ class cancel_button(QPushButton):
     def __init__(self, name=None, kind=None, parent=None):
         super(cancel_button, self).__init__(parent)
         self.setText("Cancel")
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            sys.exit(0)
 
 
 if __name__ == '__main__':
