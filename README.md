@@ -10,9 +10,9 @@ asl requester program: [requester.py](https://raw.github.com/freeaks/filer/maste
 
 status:   
 ---   
-alpha.
-it's working, but far from being feature complete, 
-and there's almost no error checking yet.
+alpha.   
+it's working, but far from being feature complete,   
+and there's almost no error checking yet.   
 
 
 done:   
