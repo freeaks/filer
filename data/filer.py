@@ -8,6 +8,7 @@ from dragwidget import DragWidget
 import sys
 import os
 import configparser
+import argparse
 from globalmenu import GlobalMenu
 
 
@@ -70,8 +71,14 @@ class Window(QWidget):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--path", help="filesystem path")
+    args = parser.parse_args()
+    print(args.path)
     app = QApplication(sys.argv)
-    window = Window(os.path.abspath(os.path.expanduser("~")))
+    # print("path=", sys.argv)
+    # window = Window(os.path.abspath(os.path.expanduser("~")))
+    window = Window(args.path)
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

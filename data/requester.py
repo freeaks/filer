@@ -2,7 +2,7 @@
 
 import sys
 import os
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QProcess
 from PyQt5.QtWidgets import(
     QApplication, QWidget, QLabel, QPushButton, QVBoxLayout,
     QHBoxLayout, QFormLayout, QListWidget, QListWidgetItem,
@@ -51,7 +51,7 @@ class requester(QWidget):
 
     def create_list(self, path):
         self.myQListWidget.clear()
-        self.file_field.set_text(name=None)
+        self.file_field.set_text(name=None, path=None)
         self.drawer_field.set_text(name=self.path.rsplit('/', 1)[-1])
         for item in os.listdir(path):
             # print(item)
@@ -112,7 +112,7 @@ class QCustomQWidget (QWidget):
                 self.parent.create_list(path=os.path.join(self.path, self.name))
                 self.parent.drawer_field.set_text(self.parent.path.rsplit('/', 1)[-1])
             if self.kind == "file":
-                self.parent.file_field.set_text(name=self.name)
+                self.parent.file_field.set_text(name=self.name, path=self.path)
 
 
 class drawer_field(QLineEdit):
@@ -123,6 +123,7 @@ class drawer_field(QLineEdit):
 
     def set_text(self, name=None):
         # print("df=", self.parent.path.rsplit('/', 1)[-1])
+        self.name = name
         self.setText(name)
 
 
@@ -130,9 +131,11 @@ class file_field(QLineEdit):
 
     def __init__(self, name=None, kind=None, parent=None):
         super(file_field, self).__init__(parent)
-        self.name = name 
+        # self.name = name 
     
-    def set_text(self, name=None):
+    def set_text(self, name=None, path=None):
+        self.path = path
+        self.name = name
         self.setText(name)
 
 
@@ -140,8 +143,23 @@ class ok_button(QPushButton):
 
     def __init__(self, name=None, kind=None, parent=None):
         super(ok_button, self).__init__(parent)
+        self.parent = parent
         self.setText("Ok")
-        self.show()
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            # print("ok=", self.parent.file_field.name)
+            if self.parent.file_field.name:
+                # print("execute =", os.path.join(self.parent.file_field.path,
+                #                                 self.parent.file_field.name))
+                file = "\"" + os.path.join(self.parent.file_field.path,
+                                           self.parent.file_field.name) + "\""
+                QProcess.execute("/usr/bin/open " + file)
+            else:
+                print("df=", self.parent.path)  # self.parent.drawer_field.name)
+                path = self.parent.path
+                QProcess.startDetached("/Users/freeaks/source/filer/data/filer.py -p " + path)
+            sys.exit(0)
 
 
 class volumes_button(QPushButton):
@@ -166,9 +184,9 @@ class parent_button(QPushButton):
 
     def mousePressEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            print("origpath=", self.parent.path)
+            # print("origpath=", self.parent.path)
             # print(self.parent.path.rsplit("/", 1))
-            print("newpath=", self.parent.path.rsplit('/', 1)[0])
+            # print("newpath=", self.parent.path.rsplit('/', 1)[0])
             new_path = self.parent.path.rsplit('/', 1)[0]
             if new_path:
                 self.parent.path = new_path
