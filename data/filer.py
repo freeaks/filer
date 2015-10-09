@@ -24,6 +24,7 @@ class Window(QWidget):
         self.config.read('prefs.cfg')
         if Window.menu is None:
             Window.menu = GlobalMenu()
+        Window.menu.new_window_signal.connect(self.on_parent_window)
         self.setWindowTitle(path)
         Window.pattern = self.config.get("background", "file")
         self.path = path
@@ -33,8 +34,8 @@ class Window(QWidget):
             QPalette.Background, QBrush(QPixmap(self.pattern)))
         self.widget.setPalette(self.palette)
         layout = QVBoxLayout(self)
-        self._drag_widget = DragWidget(path)
-        self._drag_widget.windowclass_signal.connect(self.on_make_new_window)
+        self._drag_widget = DragWidget(path, parent=self)
+        self._drag_widget.windowclass_signal.connect(self.on_new_window)
         self._drag_widget.query.connect(self.on_query)
         layout.addWidget(self._drag_widget)
         self.widget.setLayout(layout)
@@ -48,6 +49,7 @@ class Window(QWidget):
         vlayout.setSpacing(0)
         vlayout.addWidget(scroll)
         self.setLayout(vlayout)
+        Window.child_windows.append(self)
         self.show()
 
     def closeEvent(self, event):
@@ -56,8 +58,12 @@ class Window(QWidget):
                 Window.child_windows.remove(item)
                 item.deleteLater()
 
-    def on_make_new_window(self, path):
-        Window.child_windows.append(Window(os.path.realpath(path)))
+    def on_new_window(self, path):
+        Window(os.path.realpath(path))
+
+    def on_parent_window(self):
+        if self.isActiveWindow():
+            self.on_new_window(self.path.rsplit('/', 1)[0])
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window
@@ -67,17 +73,15 @@ class Window(QWidget):
 
         for item in Window.child_windows:
             print("loop child_window=", type(
-                item), "title=", item.windowTitle())
+                item), "title=", item.windowTitle(),
+                "isactive", item.isActiveWindow())
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--path", help="filesystem path")
     args = parser.parse_args()
-    print(args.path)
     app = QApplication(sys.argv)
-    # print("path=", sys.argv)
-    # window = Window(os.path.abspath(os.path.expanduser("~")))
     window = Window(args.path)
     sys.exit(app.exec_())
 

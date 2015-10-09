@@ -16,7 +16,6 @@ class DragWidget(QWidget):
         super(DragWidget, self).__init__(parent)
         self.setMinimumSize(400, 200)
         self.setAcceptDrops(True)
-
         self.path = path
         self.icons = []
         # self.clipicon = None
@@ -28,6 +27,9 @@ class DragWidget(QWidget):
             # self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
         self.clean_up()
+        # self.setFocus()
+        # self.setFocusPolicy(Qt.StrongFocus)    
+        # print("wgtf=", self.focusWidget())
         # self.updateScrollArea()
 
     def updateScrollArea(self):
@@ -76,6 +78,9 @@ class DragWidget(QWidget):
     def mouseDoubleClickEvent(self, event):
         print("Double Click") 
         self.query.emit()
+
+    def focusInEvent(self, event):
+        print("got focus=", self.path)
 
     def clean_up(self):
         print("clean_up method")
