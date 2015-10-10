@@ -92,11 +92,19 @@ class ClickableIcon(QLabel):
         if self.kind == "directory":
             self.set_icon(QPixmap("./images/folder.png"))
         else:
-            if self.config.has_option('icons', name.rsplit('.', 1)[1]):
+            try:
                 OPTION = self.config.get('icons', name.rsplit('.', 1)[1])
                 self.set_icon(QPixmap("./images/"+OPTION))
-            else:
+            except:  # ConfigParser.NoOptionError:
                 self.set_icon(QPixmap("./images/file.png"))
+            # try:
+            #     if self.config.has_option('icons', name.rsplit('.', 1)[1]):
+            #         OPTION = self.config.get('icons', name.rsplit('.', 1)[1])
+            #         self.set_icon(QPixmap("./images/"+OPTION))
+            #     else:
+            #         self.set_icon(QPixmap("./images/file.png"))
+            # except IndexError:
+            #     self.set_icon(QPixmap("./images/file.png"))
 
     def set_icon(self, icon):
         self.setPixmap(icon)
