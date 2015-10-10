@@ -20,7 +20,7 @@ done:
 - file requester: browse filesystem, open directory or execute file   
 - file manager: display files, reordering, dragndrop, copy, execute   
 - preferences: choose pattern, font color   
-- global menu: open requester, preferences, quit   
+- global menu: open requester, parent, preferences, quit   
 
 
 todo:   

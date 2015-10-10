@@ -79,6 +79,8 @@ class ClickableIcon(QLabel):
     def __init__(self, path=None, name=None, parent=None):
         super(ClickableIcon, self).__init__(parent)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed) 
+        self.config = configparser.ConfigParser()
+        self.config.read('prefs.cfg')
         self.selected = False
         self.name = name
         self.path = path
@@ -90,20 +92,11 @@ class ClickableIcon(QLabel):
         if self.kind == "directory":
             self.set_icon(QPixmap("./images/folder.png"))
         else:
-            if name.lower().endswith(('.zip', '.rar', '.lha', 'tar.gz')):
-                self.set_icon(QPixmap("./images/archive.png"))
-            elif name.lower().endswith(('.dmg', '.iso')):
-                self.set_icon(QPixmap("./images/cdfile.png"))
-            elif name.lower().endswith(('.avi', '.mp4', '.mov')):
-                self.set_icon(QPixmap("./images/anim.png"))
-            elif name.lower().endswith(('.txt', '.md')):
-                self.set_icon(QPixmap("./images/file.png"))
-            elif name.lower().endswith(('.png', '.jpg', '.tiff')):
-                self.set_icon(QPixmap("./images/picture.png"))                
+            if self.config.has_option('icons', name.rsplit('.', 1)[1]):
+                OPTION = self.config.get('icons', name.rsplit('.', 1)[1])
+                self.set_icon(QPixmap("./images/"+OPTION))
             else:
                 self.set_icon(QPixmap("./images/file.png"))
-            # make more test on file.ext
-            # to assign different icons
 
     def set_icon(self, icon):
         self.setPixmap(icon)

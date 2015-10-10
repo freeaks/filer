@@ -25,6 +25,7 @@ class Window(QWidget):
         if Window.menu is None:
             Window.menu = GlobalMenu()
         Window.menu.new_window_signal.connect(self.on_parent_window)
+        Window.menu.clean_up_signal.connect(self.on_clean_up)
         self.setWindowTitle(path)
         Window.pattern = self.config.get("background", "file")
         self.path = path
@@ -65,16 +66,15 @@ class Window(QWidget):
         if self.isActiveWindow():
             self.on_new_window(self.path.rsplit('/', 1)[0])
 
+    def on_clean_up(self):
+        if self.isActiveWindow():
+            self._drag_widget.clean_up()
+
     def on_query(self):
         # get info when doubleclicking on nothing in a window
         print("got query=", self.windowTitle(),
               "obj=", self, "type=", type(self),
               "len child_windows=", len(Window.child_windows))
-
-        for item in Window.child_windows:
-            print("loop child_window=", type(
-                item), "title=", item.windowTitle(),
-                "isactive", item.isActiveWindow())
 
 
 def main():
