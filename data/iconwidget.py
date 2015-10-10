@@ -49,6 +49,9 @@ class IconWidget(QWidget):
     def getText(self):
         return self.text
 
+    def selected_list(self):
+        pass
+
     def mouseMoveEvent(self, event):
         # if the left mouse button is used
         if self.drag_started:
@@ -86,9 +89,9 @@ class ClickableIcon(QLabel):
         self.path = path
         self.icon = None
         self.kind = self.parent().kind
-        self.select_icon(name)
+        self.apply_icon(name)
 
-    def select_icon(self, name):
+    def apply_icon(self, name):
         if self.kind == "directory":
             self.set_icon(QPixmap("./images/folder.png"))
         else:
@@ -102,16 +105,17 @@ class ClickableIcon(QLabel):
         self.setPixmap(icon)
         self.icon = icon
 
-    def mousePressEvent(self, event):
-        # event.accept()
+    def select_icon(self):
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.yellow)
         self.setPalette(p)
+        self.clicked.emit()
+        print("clickedicon=", self.name)
 
+    def mousePressEvent(self, event):
         if event.buttons() == Qt.LeftButton: 
-            self.clicked.emit()
-            print("clickedicon=", self.name)
+            self.select_icon()
             
         if event.buttons() == Qt.RightButton:
             menu = QMenu("Icon Menu")

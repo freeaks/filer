@@ -1,5 +1,6 @@
-from PyQt5.QtCore import Qt, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QMenu
+from PyQt5.QtCore import Qt, QPoint, pyqtSignal, QRect, QSize
+from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand
+# from PyQt5.QtGui import QRubberBand
 from iconwidget import IconWidget
 import os
 import shutil
@@ -16,6 +17,7 @@ class DragWidget(QWidget):
         super(DragWidget, self).__init__(parent)
         self.setMinimumSize(400, 200)
         self.setAcceptDrops(True)
+        self.rubberband = QRubberBand(QRubberBand.Rectangle, self)
         self.path = path
         self.icons = []
         # self.clipicon = None
@@ -63,6 +65,12 @@ class DragWidget(QWidget):
         if event.buttons() == Qt.LeftButton:
             for item in self.icons:
                 item.reset_selection()
+            
+            self.origin = event.pos()
+            self.rubberband.setGeometry(QRect(self.origin, QSize()))
+            self.rubberband.show()
+            # QWidget.mousePressEvent(self, event)
+            # print("where's my rubberband?")
 
         if event.buttons() == Qt.RightButton:
             menu = QMenu("Window Menu")
@@ -74,6 +82,26 @@ class DragWidget(QWidget):
             eventpos = event.screenPos()
             qpoint = QPoint(eventpos.x(), eventpos.y())
             menu.exec_(qpoint)
+
+    def mouseMoveEvent(self, event):
+        if self.rubberband.isVisible():
+            self.rubberband.setGeometry(
+                QRect(self.origin, event.pos()).normalized())
+        # QWidget.mouseMoveEvent(self, event)
+
+    def mouseReleaseEvent(self, event):
+        selected = []
+        if self.rubberband.isVisible():
+            self.rubberband.hide()
+            
+            rect = self.rubberband.geometry()
+            for child in self.findChildren(IconWidget):
+                if rect.intersects(child.geometry()):
+                    selected.append(child)
+                    child.icon.select_icon()
+        print("selected len=", len(selected))
+        # for item in selected:
+        #     item.icon.selected = True
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click") 
