@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from PyQt5.QtGui import QPalette, QBrush, QPixmap
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import(
     QApplication, QVBoxLayout, QScrollArea, QWidget)
 from dragwidget import DragWidget
@@ -17,6 +17,7 @@ class Window(QWidget):
     child_windows = []
     pattern = None
     menu = None
+    modifier = False
 
     def __init__(self, path, parent=None):
         super(Window, self).__init__()
@@ -36,7 +37,7 @@ class Window(QWidget):
         self.widget.setPalette(self.palette)
         layout = QVBoxLayout(self)
         self._drag_widget = DragWidget(path, parent=self)
-        self._drag_widget.windowclass_signal.connect(self.on_new_window)
+        self._drag_widget.new_window_signal.connect(self.on_new_window)
         self._drag_widget.query.connect(self.on_query)
         layout.addWidget(self._drag_widget)
         self.widget.setLayout(layout)
@@ -59,16 +60,38 @@ class Window(QWidget):
                 Window.child_windows.remove(item)
                 item.deleteLater()
 
+    def window_exists(self, path=None):
+        for item in Window.child_windows:
+            if item.path == path:
+                print("exist=", path)
+                item.raise_()
+                return True
+        return False
+
     def on_new_window(self, path):
-        Window(os.path.realpath(path))
+        if self.window_exists(path):
+            return
+        else:
+            Window(os.path.realpath(path))
 
     def on_parent_window(self):
         if self.isActiveWindow():
-            self.on_new_window(self.path.rsplit('/', 1)[0])
+            if self.window_exists(self.path.rsplit('/', 1)[0]):
+                    return
+            else:
+                self.on_new_window(self.path.rsplit('/', 1)[0])
 
     def on_clean_up(self):
         if self.isActiveWindow():
             self._drag_widget.clean_up()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Control:
+            Window.modifier = True
+
+    def keyReleaseEvent(self, event):
+        if Window.modifier:
+            Window.modifier = False
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window

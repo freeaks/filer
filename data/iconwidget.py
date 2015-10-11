@@ -1,9 +1,9 @@
 
 from PyQt5.QtGui import QPixmap, QDrag
 from PyQt5.QtCore import (Qt, QByteArray, QMimeData, 
-                          QPoint, pyqtSignal, QProcess)
+                          pyqtSignal, QProcess)
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, 
-                             QMenu, QSizePolicy)
+                             QSizePolicy)
 import os
 import configparser
 # import shutil
@@ -13,32 +13,29 @@ class IconWidget(QWidget):
     new_window = pyqtSignal(str)
     clipboard = pyqtSignal(object)
 
-    def __init__(self, parent=None, name="None", path="None"):
+    def __init__(self, parent=None, name=None, path=None, dir=None):
         super().__init__(parent)
         self.path = path
         self.name = name
+        self.drawer = dir
         self.drag_started = False 
         self.mimetext = "application/x-icon"
         self.mpixmap = None
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-        self.kind = self.what_kind(path, name)
         self.text = ClickableLabel(path=path, name=name)
-        self.icon = ClickableIcon(path=path, name=name, parent=self)
+        self.icon = ClickableIcon(path=path, name=name, drawer=dir, parent=self)
         self.icon.clicked.connect(self._on_drag_started)
         self.icon.double_clicked.connect(self.open_window)
         self.layout.addWidget(self.icon)
         self.layout.addWidget(self.text)
 
-    def what_kind(self, path, name):
-        if os.path.isdir(os.path.join(path, name)):
-            return "directory"
-        return "file"
-
     def reset_selection(self):
-        self.icon.selected = False
-        self.icon.setAutoFillBackground(False)
+        for item in self.parent().icons: 
+            item.icon.selected = False
+            item.icon.setAutoFillBackground(False)
+        # print("reset selection", len(self.parent().icons))
 
     def getIconWidget(self):
         return self
@@ -49,8 +46,9 @@ class IconWidget(QWidget):
     def getText(self):
         return self.text
 
-    def selected_list(self):
-        pass
+    def get_modifier(self):
+        # print("modif", self.parent().get_modifier())
+        return self.parent().get_modifier()
 
     def mouseMoveEvent(self, event):
         # if the left mouse button is used
@@ -61,7 +59,7 @@ class IconWidget(QWidget):
             drag = QDrag(self) 
             drag.setMimeData(mime_data)
             drag.setPixmap(self.icon.get_icon())
-            drag.setHotSpot(self.rect().topLeft())  # where do we drag from
+            drag.setHotSpot(self.rect().topLeft())
             if drag.exec_(Qt.MoveAction):
                 self.parent().icons.remove(self)
                 self.deleteLater()
@@ -79,71 +77,72 @@ class ClickableIcon(QLabel):
     clicked = pyqtSignal()
     double_clicked = pyqtSignal()
  
-    def __init__(self, path=None, name=None, parent=None):
+    def __init__(self, path=None, name=None, parent=None, drawer=None):
         super(ClickableIcon, self).__init__(parent)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed) 
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        # self.setFrameShape
+        self.parent = parent
         self.config = configparser.ConfigParser()
         self.config.read('prefs.cfg')
         self.selected = False
         self.name = name
         self.path = path
         self.icon = None
-        self.kind = self.parent().kind
+        self.drawer = drawer
         self.apply_icon(name)
 
     def apply_icon(self, name):
-        if self.kind == "directory":
+        """ parse cfg file to assign icon or use fallback """
+        if self.drawer:
             self.set_icon(QPixmap("./images/folder.png"))
         else:
             try:
                 OPTION = self.config.get('icons', name.rsplit('.', 1)[1])
                 self.set_icon(QPixmap(OPTION))
-            except:  # ConfigParser.NoOptionError:
+            except:
                 self.set_icon(QPixmap("./images/file.png"))
 
     def set_icon(self, icon):
         self.setPixmap(icon)
         self.icon = icon
 
+    def icon_selection_mode(self):
+        """ choose between multi or single icon selection """
+        if self.parent.get_modifier():
+            self.select_icon()
+        else:
+            self.parent.reset_selection()
+            self.select_icon()
+
+    def deselect_icon(self):
+        self.selected = False
+        self.setAutoFillBackground(False)
+
     def select_icon(self):
         self.setAutoFillBackground(True)
+        self.selected = True
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.yellow)
         self.setPalette(p)
         self.clicked.emit()
-        print("clickedicon=", self.name)
 
     def mousePressEvent(self, event):
         if event.buttons() == Qt.LeftButton: 
-            self.select_icon()
-            
-        if event.buttons() == Qt.RightButton:
-            menu = QMenu("Icon Menu")
-            copy = menu.addAction("Copy")
-            copy.triggered.connect(self.copy_icon)
-            delete = menu.addAction("Delete")
-            delete.triggered.connect(self.delete_icon)
-            eventpos = event.screenPos()
-            qpoint = QPoint(eventpos.x(), eventpos.y())
-            menu.exec_(qpoint)
+                self.icon_selection_mode()
 
     def mouseDoubleClickEvent(self, event):
-        if self.kind == "directory":
+        if self.drawer:
             self.double_clicked.emit()
         else:
-            print("execute =", os.path.join(self.path, self.name))
             file = "\"" + os.path.join(self.path, self.name) + "\""
             QProcess.execute("/usr/bin/open " + file)
-            # event.accept()
 
     def copy_icon(self):
         print("copy_icon method")
         self.clipboard.emit(self)
-        pass
 
     def delete_icon(self):
         print("delete_icon method")
-        pass
 
     def get_icon(self):
         return self.icon 
@@ -151,14 +150,16 @@ class ClickableIcon(QLabel):
 
 class ClickableLabel(QLabel):
 
+    """ icon filename class """
+
     def __init__(self, path=None, name=None, parent=None):
         super(ClickableLabel, self).__init__(parent)
-        self.string_width = None
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        # self.setGeometry(QRect(0, 40, 40, 40))
         self.selected = False
         self.name = name
         self.path = path
         self.set_name(name)
-        # self.property
         config = configparser.ConfigParser()
         config.read('prefs.cfg')
         self.color = config.get("colors", "label")
@@ -167,12 +168,13 @@ class ClickableLabel(QLabel):
                            """;}""")
 
     def set_name(self, name):
+        """ set icon label """
         temp_name = None
-        label_length = len(name)
+        label_length = len(name)       
         if label_length > 11:
             if label_length < 22:
                 temp_name = name[:10] + "\n" + name[10:]
-            elif label_length > 22:
+            elif label_length >= 22:
                 temp_name = name[:10] + "\n" + name[10:17] + "..." + name[-3:]
             self.setText(temp_name)
         else:

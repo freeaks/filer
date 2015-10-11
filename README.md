@@ -19,6 +19,7 @@ done:
 ---
 - file requester: browse filesystem, open directory or execute file   
 - file manager: display files, reordering, dragndrop, copy, execute   
+		select, multiselect
 - preferences: choose pattern, font color   
 - global menu: open requester, parent, preferences, quit   
 

@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt, QPoint, pyqtSignal, QRect, QSize
-from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand
+from PyQt5.QtCore import Qt, pyqtSignal, QRect, QSize
+from PyQt5.QtWidgets import QWidget, QRubberBand
 # from PyQt5.QtGui import QRubberBand
-from iconwidget import IconWidget
+from iconwidget import IconWidget, ClickableIcon, ClickableLabel
 import os
 import shutil
 
@@ -10,29 +10,30 @@ class DragWidget(QWidget):
     spacerX = 16
     spacerY = 16
     clipicon = None
-    windowclass_signal = pyqtSignal(str)
+    new_window_signal = pyqtSignal(str)
     query = pyqtSignal()
 
     def __init__(self, path, parent=None):
         super(DragWidget, self).__init__(parent)
         self.setMinimumSize(400, 200)
         self.setAcceptDrops(True)
+        self.parent = parent
+        # self.parent.modifier_signal.connect(self.get_modifier)
+        self.modifier = False
         self.rubberband = QRubberBand(QRubberBand.Rectangle, self)
         self.path = path
         self.icons = []
         # self.clipicon = None
-        for name in os.listdir(path):
-            icon_widget = IconWidget(self, name=name, path=self.path)
-            icon_widget.new_window.connect(self.windowclass_signal.emit)
+        for item in os.scandir(path):
+            if item.is_dir():
+                icon_widget = IconWidget(parent=self, name=item.name, path=self.path, dir=True)
+            else:
+                icon_widget = IconWidget(parent=self, name=item.name, path=self.path, dir=False)
+            icon_widget.new_window.connect(self.new_window_signal.emit)
             icon_widget.clipboard.connect(self.on_clipboard)
             self.icons.append(icon_widget)
-            # self.icons[-1].move(DragWidget.spacerX, DragWidget.spacerY)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
         self.clean_up()
-        # self.setFocus()
-        # self.setFocusPolicy(Qt.StrongFocus)    
-        # print("wgtf=", self.focusWidget())
-        # self.updateScrollArea()
 
     def updateScrollArea(self):
         """ set the dimension of the widget """
@@ -54,34 +55,29 @@ class DragWidget(QWidget):
         event.accept()
         if event.mimeData().hasFormat("application/x-icon"):
             name = event.source().name
-            icon_widget = IconWidget(self, name=name, path=self.path)
-            icon_widget.new_window.connect(self.windowclass_signal.emit)
+            drawer = event.source().drawer
+            # print("d=", drawer)
+            if drawer:
+                icon_widget = IconWidget(self, name=name, path=self.path, dir=True)
+            else: 
+                icon_widget = IconWidget(self, name=name, path=self.path, dir=False)
+            icon_widget.new_window.connect(self.new_window_signal.emit)
             self.icons.append(icon_widget)
             self.icons[-1].move(event.pos().x(), event.pos().y())
             self.icons[-1].show()
             self.updateScrollArea()
 
+    def get_modifier(self):
+        return self.parent.modifier
+
     def mousePressEvent(self, event):
         if event.buttons() == Qt.LeftButton:
             for item in self.icons:
-                item.reset_selection()
+                item.icon.deselect_icon()
             
             self.origin = event.pos()
             self.rubberband.setGeometry(QRect(self.origin, QSize()))
             self.rubberband.show()
-            # QWidget.mousePressEvent(self, event)
-            # print("where's my rubberband?")
-
-        if event.buttons() == Qt.RightButton:
-            menu = QMenu("Window Menu")
-            clean = menu.addAction("Clean Up")
-            clean.triggered.connect(self.clean_up)
-            if DragWidget.clipicon is not None:
-                paste = menu.addAction("Paste")
-                paste.triggered.connect(self.paste_icon)
-            eventpos = event.screenPos()
-            qpoint = QPoint(eventpos.x(), eventpos.y())
-            menu.exec_(qpoint)
 
     def mouseMoveEvent(self, event):
         if self.rubberband.isVisible():
@@ -96,12 +92,11 @@ class DragWidget(QWidget):
             
             rect = self.rubberband.geometry()
             for child in self.findChildren(IconWidget):
+                
                 if rect.intersects(child.geometry()):
                     selected.append(child)
                     child.icon.select_icon()
         print("selected len=", len(selected))
-        # for item in selected:
-        #     item.icon.selected = True
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click") 
