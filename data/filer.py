@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from PyQt5.QtGui import QPalette, QBrush, QPixmap
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import(
     QApplication, QVBoxLayout, QScrollArea, QWidget)
 from dragwidget import DragWidget
@@ -27,6 +27,7 @@ class Window(QWidget):
             Window.menu = GlobalMenu()
         Window.menu.new_window_signal.connect(self.on_parent_window)
         Window.menu.clean_up_signal.connect(self.on_clean_up)
+        Window.menu.delete_signal.connect(self.on_delete)
         self.setWindowTitle(path)
         Window.pattern = self.config.get("background", "file")
         self.path = path
@@ -63,7 +64,6 @@ class Window(QWidget):
     def window_exists(self, path=None):
         for item in Window.child_windows:
             if item.path == path:
-                print("exist=", path)
                 item.raise_()
                 return True
         return False
@@ -76,14 +76,19 @@ class Window(QWidget):
 
     def on_parent_window(self):
         if self.isActiveWindow():
-            if self.window_exists(self.path.rsplit('/', 1)[0]):
-                    return
+            path = self.path.rsplit('/', 1)[0]
+            if self.window_exists(path):
+                return
             else:
-                self.on_new_window(self.path.rsplit('/', 1)[0])
+                self.on_new_window(path)
 
     def on_clean_up(self):
         if self.isActiveWindow():
             self._drag_widget.clean_up()
+
+    def on_delete(self):
+        if self.isActiveWindow():
+            self._drag_widget.delete_icon()            
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Control:
@@ -95,9 +100,10 @@ class Window(QWidget):
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window
-        print("got query=", self.windowTitle(),
-              "obj=", self, "type=", type(self),
-              "len child_windows=", len(Window.child_windows))
+        print("got query=", self.windowTitle(), "\n",
+              "obj=", self, "type=", type(self), "\n",
+              "len child_windows=", len(Window.child_windows), "\n",
+              "len icon number", len(self._drag_widget.icons))
 
 
 def main():

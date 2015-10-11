@@ -8,6 +8,7 @@ class GlobalMenu(QWidget):
 
     new_window_signal = pyqtSignal()
     clean_up_signal = pyqtSignal()
+    delete_signal = pyqtSignal()
 
     def __init__(self, parent=None):
         super(GlobalMenu, self).__init__(parent)
@@ -34,13 +35,15 @@ class GlobalMenu(QWidget):
         paste_action.setShortcut('Ctrl+V')
         clean_action = QAction('Clean Up', self)
         clean_action.setShortcut('Ctrl+;')
-        delete_action = QAction('Delete', self)
+        delete_action = QAction('Move to Trash', self)
+        delete_action.setShortcut('Ctrl+Backspace')
 
         preferences_action.triggered.connect(self.preferences_action)
         quit_action.triggered.connect(self.quit_action)
         requester_action.triggered.connect(self.requester_action)
         parent_action.triggered.connect(self.parent_action)
         clean_action.triggered.connect(self.clean_action)
+        delete_action.triggered.connect(self.delete_action)
         
         file_menu.addAction(requester_action)
         # file_menu.addAction(open_drawer_action)
@@ -72,5 +75,9 @@ class GlobalMenu(QWidget):
         # print("wp=", Window.pa)
         
     def clean_action(self):
-        print("clean up")
+        print("clean up menu")
         self.clean_up_signal.emit()
+
+    def delete_action(self):
+        print("delete action menu")
+        self.delete_signal.emit()

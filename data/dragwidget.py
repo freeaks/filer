@@ -18,7 +18,7 @@ class DragWidget(QWidget):
         self.setMinimumSize(400, 200)
         self.setAcceptDrops(True)
         self.parent = parent
-        # self.parent.modifier_signal.connect(self.get_modifier)
+        # self.parent.menu.connect(self.delete_icon)
         self.modifier = False
         self.rubberband = QRubberBand(QRubberBand.Rectangle, self)
         self.path = path
@@ -56,7 +56,9 @@ class DragWidget(QWidget):
         if event.mimeData().hasFormat("application/x-icon"):
             name = event.source().name
             drawer = event.source().drawer
-            # print("d=", drawer)
+            srce = event.source().path + "/" + name
+            dest = self.path + "/"
+            self.move_icon(srce, dest)
             if drawer:
                 icon_widget = IconWidget(self, name=name, path=self.path, dir=True)
             else: 
@@ -86,24 +88,20 @@ class DragWidget(QWidget):
         # QWidget.mouseMoveEvent(self, event)
 
     def mouseReleaseEvent(self, event):
-        selected = []
+        # selected = []
         if self.rubberband.isVisible():
             self.rubberband.hide()
             
             rect = self.rubberband.geometry()
             for child in self.findChildren(IconWidget):
-                
                 if rect.intersects(child.geometry()):
-                    selected.append(child)
+                    # selected.append(child)
                     child.icon.select_icon()
-        print("selected len=", len(selected))
+        # print("selected len=", len(selected))
 
     def mouseDoubleClickEvent(self, event):
         print("Double Click") 
         self.query.emit()
-
-    def focusInEvent(self, event):
-        print("got focus=", self.path)
 
     def clean_up(self):
         print("clean_up method")
@@ -119,6 +117,31 @@ class DragWidget(QWidget):
         DragWidget.spacerX = 16
         DragWidget.spacerY = 16
         self.updateScrollArea()
+
+    def move_icon(self, source, dest):
+        try:
+            shutil.move(source, dest)
+        except Exception as err:
+            print(err)
+
+    def copy_icon(self, source, dest):
+        pass
+
+    def delete_icon(self):
+        dest = os.path.expanduser("~") + "/.Trash/"
+        # print(dest)
+        counter = 0
+        for item in self.icons:
+            if item.icon.selected:
+                source = item.path + "/" + item.name
+                # print("move=", source, "to=", dest)
+                # counter += 1
+                if source is not "":
+                    try:
+                        shutil.move(source, dest)
+                    except Exception as err:
+                        print(err)
+        # print("icons selected=", counter)
 
     def paste_icon(self):
         print("---")
