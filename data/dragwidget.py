@@ -122,7 +122,7 @@ class DragWidget(QWidget):
             for item in self.icons:
                 item.icon.deselect_icon()
             self.clear_dnd() 
-            
+
             self.origin = event.pos()
             self.rubberband.setGeometry(QRect(self.origin, QSize()))
             self.rubberband.show()
