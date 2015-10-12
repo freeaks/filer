@@ -18,6 +18,8 @@ class IconWidget(QWidget):
         self.path = path
         self.name = name
         self.drawer = dir
+        self.moving_icons = []
+        self.delete_flag = False
         self.drag_started = False 
         self.mimetext = "application/x-icon"
         self.mpixmap = None
@@ -26,7 +28,7 @@ class IconWidget(QWidget):
         self.layout.setSpacing(0)
         self.text = ClickableLabel(path=path, name=name)
         self.icon = ClickableIcon(path=path, name=name, drawer=dir, parent=self)
-        self.icon.clicked.connect(self._on_drag_started)
+        # self.icon.clicked.connect(self._on_drag_started)
         self.icon.double_clicked.connect(self.open_window)
         self.layout.addWidget(self.icon)
         self.layout.addWidget(self.text)
@@ -51,18 +53,39 @@ class IconWidget(QWidget):
         return self.parent().get_modifier()
 
     def mouseMoveEvent(self, event):
-        # if the left mouse button is used
-        if self.drag_started:
-            data = QByteArray()
-            mime_data = QMimeData()
-            mime_data.setData(self.mimetext, data)
-            drag = QDrag(self) 
-            drag.setMimeData(mime_data)
-            drag.setPixmap(self.icon.get_icon())
-            drag.setHotSpot(self.rect().topLeft())
-            if drag.exec_(Qt.MoveAction):
+        # print("(iw) parent=", self.parent())
+        # for item in self.parent().icons:
+        #     if item.icon.selected:
+        #         item.delete_flag = True
+        #         self.moving_icons.append(item)
+
+        # print("(iw) moving number=", len(self.moving_icons))
+
+        # if self.drag_started:
+        data = QByteArray()
+        mime_data = QMimeData()
+        mime_data.setData(self.mimetext, data)
+        drag = QDrag(self) 
+        drag.setMimeData(mime_data)
+        drag.setPixmap(self.icon.get_icon())
+        drag.setHotSpot(self.rect().topLeft())
+
+        if drag.exec_(Qt.MoveAction):
+            if len(self.parent().src_selected) > 0:
+                for item in self.parent().src_selected:
+                    self.parent().icons.remove(item)
+                    item.deleteLater()
+            else:
                 self.parent().icons.remove(self)
                 self.deleteLater()
+
+        self.parent().src_selected.clear()
+        self.parent().src_dragwidget = None
+
+        #     if self in self.parent().icons:
+        #         self.parent().icons.remove(self)
+        #         self.deleteLater()
+        # drag.exec_(Qt.MoveAction)
 
     def _on_drag_started(self):
         self.drag_started = True
@@ -108,11 +131,12 @@ class ClickableIcon(QLabel):
 
     def icon_selection_mode(self):
         """ choose between multi or single icon selection """
-        if self.parent.get_modifier():
-            self.select_icon()
-        else:
-            self.parent.reset_selection()
-            self.select_icon()
+        # if self.parent.get_modifier():
+        #     self.select_icon()
+        # else:
+        #     self.parent.reset_selection()
+        #     self.select_icon()
+        self.select_icon()
 
     def deselect_icon(self):
         self.selected = False

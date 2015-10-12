@@ -1,9 +1,17 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QRect, QSize
 from PyQt5.QtWidgets import QWidget, QRubberBand
 # from PyQt5.QtGui import QRubberBand
-from iconwidget import IconWidget, ClickableIcon, ClickableLabel
+from iconwidget import IconWidget
 import os
 import shutil
+
+# color
+# -----------
+RED = '\033[91m'
+GRE = '\033[92m'
+BLU = '\033[94m'
+END = '\033[0m'
+# -----------
 
 
 class DragWidget(QWidget):
@@ -12,6 +20,8 @@ class DragWidget(QWidget):
     clipicon = None
     new_window_signal = pyqtSignal(str)
     query = pyqtSignal()
+    src_dragwidget = None
+    src_selected = []
 
     def __init__(self, path, parent=None):
         super(DragWidget, self).__init__(parent)
@@ -24,6 +34,7 @@ class DragWidget(QWidget):
         self.path = path
         self.icons = []
         # self.clipicon = None
+        # self.moving_icons = []
         for item in os.scandir(path):
             if item.is_dir():
                 icon_widget = IconWidget(parent=self, name=item.name, path=self.path, dir=True)
@@ -53,21 +64,49 @@ class DragWidget(QWidget):
 
     def dropEvent(self, event):
         event.accept()
-        if event.mimeData().hasFormat("application/x-icon"):
-            name = event.source().name
-            drawer = event.source().drawer
-            srce = event.source().path + "/" + name
-            dest = self.path + "/"
-            self.move_icon(srce, dest)
-            if drawer:
-                icon_widget = IconWidget(self, name=name, path=self.path, dir=True)
-            else: 
-                icon_widget = IconWidget(self, name=name, path=self.path, dir=False)
-            icon_widget.new_window.connect(self.new_window_signal.emit)
-            self.icons.append(icon_widget)
-            self.icons[-1].move(event.pos().x(), event.pos().y())
-            self.icons[-1].show()
-            self.updateScrollArea()
+
+        icon_list = []
+        
+        if len(DragWidget.src_selected) > 0:
+            for item in DragWidget.src_selected:
+                icon_list.append(item)
+        else:
+            icon_list.append(event.source())
+
+        for item in icon_list:
+
+            src_path = item.path
+            dst_path = self.path
+
+            if event.mimeData().hasFormat("application/x-icon"):
+                # name = event.source().name
+                # drawer = event.source().drawer
+                name = item.name
+                drawer = item.drawer
+                
+                print("loop item.name=[", RED, name, END, "]\n",
+                      "drawer=[", RED, drawer, END, "]\n",
+                      "src_path=[", RED, src_path + "/" + name, END, "]\n",
+                      "dst_path=[", RED, dst_path + "/", END, "]\n",
+                      "icon_list=[", RED, len(icon_list), END, "]\n",
+                      "---------------")
+
+                if src_path is not dst_path:
+                    src_path += "/" + name
+                    dst_path += "/"
+                    # print("src=", src_path, "dst=", dst_path)
+                    # self.move_icon(src_path, dst_path)
+                if drawer:
+                    icon_widget = IconWidget(self, name=name, path=self.path, dir=True)
+                else: 
+                    icon_widget = IconWidget(self, name=name, path=self.path, dir=False)
+                icon_widget.new_window.connect(self.new_window_signal.emit)
+                self.icons.append(icon_widget)
+                self.icons[-1].move(event.pos().x(), event.pos().y())
+                self.icons[-1].show()
+        # self.remove_old()
+        # self.updateScrollArea()
+        # self.clean_up()
 
     def get_modifier(self):
         return self.parent.modifier
@@ -88,7 +127,9 @@ class DragWidget(QWidget):
         # QWidget.mouseMoveEvent(self, event)
 
     def mouseReleaseEvent(self, event):
-        # selected = []
+        # print("len1=", len(self.icons))
+        DragWidget.src_selected.clear()
+        selected = []
         if self.rubberband.isVisible():
             self.rubberband.hide()
             
@@ -97,14 +138,17 @@ class DragWidget(QWidget):
                 if rect.intersects(child.geometry()):
                     # selected.append(child)
                     child.icon.select_icon()
-        # print("selected len=", len(selected))
+                    DragWidget.src_selected.append(child)
+                    if DragWidget.src_dragwidget is not self:
+                        print(GRE, "saving the wg", END)
+                        DragWidget.src_dragwidget = self
 
     def mouseDoubleClickEvent(self, event):
-        print("Double Click") 
+        print(BLU, "Double Click", END) 
         self.query.emit()
 
     def clean_up(self):
-        print("clean_up method")
+        # print("clean_up method")
         # print("sw=", self.window().width())
         for item in self.icons:
             item.move(DragWidget.spacerX, DragWidget.spacerY)
@@ -138,6 +182,8 @@ class DragWidget(QWidget):
                 # counter += 1
                 if source is not "":
                     try:
+                        self.icons.remove(item)
+                        item.deleteLater()
                         shutil.move(source, dest)
                     except Exception as err:
                         print(err)

@@ -11,6 +11,14 @@ import configparser
 import argparse
 from globalmenu import GlobalMenu
 
+# color
+# -----------
+RED = '\033[91m'
+GRE = '\033[92m'
+BLU = '\033[94m'
+END = '\033[0m'
+# -----------
+
 
 class Window(QWidget):
 
@@ -100,10 +108,16 @@ class Window(QWidget):
 
     def on_query(self):
         # get info when doubleclicking on nothing in a window
-        print("got query=", self.windowTitle(), "\n",
-              "obj=", self, "type=", type(self), "\n",
-              "len child_windows=", len(Window.child_windows), "\n",
-              "len icon number", len(self._drag_widget.icons))
+
+        print("query", "\n", 
+              "window_title=[", RED, self.windowTitle(), END, "]\n",
+              "window_obj=[", RED, self, END,  "]\n", 
+              "type win_obj=[", RED, type(self), END, "]\n",
+              "len tot child_windows=[", RED, len(Window.child_windows), END, "]\n",
+              "len icon list this win=[", RED, len(self._drag_widget.icons), END, "]\n",
+              "src_dwt=[", RED, DragWidget.src_dragwidget, END, "]\n",
+              "src_sel=[", RED, len(DragWidget.src_selected), END, "]\n",
+              "-----------------------")
 
 
 def main():
