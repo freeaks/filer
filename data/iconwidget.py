@@ -8,6 +8,14 @@ import os
 import configparser
 # import shutil
 
+# color
+# -----------
+RED = '\033[91m'
+GRE = '\033[92m'
+BLU = '\033[94m'
+END = '\033[0m'
+# -----------
+
 
 class IconWidget(QWidget):
     new_window = pyqtSignal(str)
@@ -53,13 +61,15 @@ class IconWidget(QWidget):
         return self.parent().get_modifier()
 
     def mouseMoveEvent(self, event):
-        # print("(iw) parent=", self.parent())
-        # for item in self.parent().icons:
-        #     if item.icon.selected:
-        #         item.delete_flag = True
-        #         self.moving_icons.append(item)
 
-        # print("(iw) moving number=", len(self.moving_icons))
+        if self.parent() is not self.parent().src_dragwidget:
+            print("\n", GRE, "(iw: start drag) clearing the wg", END, "\n")
+            for item in self.parent().src_selected:
+                item.icon.deselect_icon()
+            self.parent().clear_dnd()
+            
+            # self.parent().src_selected.clear()
+            # self.parent().src_dragwidget = None
 
         # if self.drag_started:
         data = QByteArray()
@@ -72,6 +82,8 @@ class IconWidget(QWidget):
 
         if drag.exec_(Qt.MoveAction):
             if len(self.parent().src_selected) > 0:
+                # and self.parent() is self.parent().src_dragwidget:
+                print("equallity=", GRE, self.parent() is self.parent().src_dragwidget, END)
                 for item in self.parent().src_selected:
                     self.parent().icons.remove(item)
                     item.deleteLater()
@@ -79,13 +91,9 @@ class IconWidget(QWidget):
                 self.parent().icons.remove(self)
                 self.deleteLater()
 
-        self.parent().src_selected.clear()
-        self.parent().src_dragwidget = None
-
-        #     if self in self.parent().icons:
-        #         self.parent().icons.remove(self)
-        #         self.deleteLater()
-        # drag.exec_(Qt.MoveAction)
+        print("\n", GRE, "(iw: end drag) clearing the wg", END, "\n")
+        self.parent().clear_dnd()
+        print("and now=", self.parent().src_dragwidget)
 
     def _on_drag_started(self):
         self.drag_started = True

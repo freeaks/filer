@@ -68,6 +68,7 @@ class DragWidget(QWidget):
         icon_list = []
         
         if len(DragWidget.src_selected) > 0:
+            print("equality here too=", GRE, self is DragWidget.src_dragwidget, END)
             for item in DragWidget.src_selected:
                 icon_list.append(item)
         else:
@@ -108,6 +109,10 @@ class DragWidget(QWidget):
         # self.updateScrollArea()
         # self.clean_up()
 
+    def clear_dnd(self):
+        DragWidget.src_dragwidget = None
+        DragWidget.src_selected.clear()
+
     def get_modifier(self):
         return self.parent.modifier
 
@@ -115,6 +120,7 @@ class DragWidget(QWidget):
         if event.buttons() == Qt.LeftButton:
             for item in self.icons:
                 item.icon.deselect_icon()
+            self.clear_dnd() 
             
             self.origin = event.pos()
             self.rubberband.setGeometry(QRect(self.origin, QSize()))
@@ -140,7 +146,7 @@ class DragWidget(QWidget):
                     child.icon.select_icon()
                     DragWidget.src_selected.append(child)
                     if DragWidget.src_dragwidget is not self:
-                        print(GRE, "saving the wg", END)
+                        print("\n", GRE, "(dw: mouse release rubber) saving the wg", END, "\n")
                         DragWidget.src_dragwidget = self
 
     def mouseDoubleClickEvent(self, event):

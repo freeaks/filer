@@ -114,6 +114,7 @@ class Window(QWidget):
               "window_obj=[", RED, self, END,  "]\n", 
               "type win_obj=[", RED, type(self), END, "]\n",
               "len tot child_windows=[", RED, len(Window.child_windows), END, "]\n",
+              "this dwgt=[", RED, self._drag_widget, END, "]\n",
               "len icon list this win=[", RED, len(self._drag_widget.icons), END, "]\n",
               "src_dwt=[", RED, DragWidget.src_dragwidget, END, "]\n",
               "src_sel=[", RED, len(DragWidget.src_selected), END, "]\n",
