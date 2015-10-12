@@ -8,7 +8,7 @@ import os
 import configparser
 # import shutil
 
-# color
+# debug color
 # -----------
 RED = '\033[91m'
 GRE = '\033[92m'
@@ -57,20 +57,13 @@ class IconWidget(QWidget):
         return self.text
 
     def get_modifier(self):
-        # print("modif", self.parent().get_modifier())
         return self.parent().get_modifier()
 
     def mouseMoveEvent(self, event):
-
         if self.parent() is not self.parent().src_dragwidget:
-            print("\n", GRE, "(iw: start drag) clearing the wg", END, "\n")
             for item in self.parent().src_selected:
                 item.icon.deselect_icon()
             self.parent().clear_dnd()
-            
-            # self.parent().src_selected.clear()
-            # self.parent().src_dragwidget = None
-
         # if self.drag_started:
         data = QByteArray()
         mime_data = QMimeData()
@@ -79,21 +72,15 @@ class IconWidget(QWidget):
         drag.setMimeData(mime_data)
         drag.setPixmap(self.icon.get_icon())
         drag.setHotSpot(self.rect().topLeft())
-
         if drag.exec_(Qt.MoveAction):
             if len(self.parent().src_selected) > 0:
-                # and self.parent() is self.parent().src_dragwidget:
-                print("equallity=", GRE, self.parent() is self.parent().src_dragwidget, END)
                 for item in self.parent().src_selected:
                     self.parent().icons.remove(item)
                     item.deleteLater()
             else:
                 self.parent().icons.remove(self)
                 self.deleteLater()
-
-        print("\n", GRE, "(iw: end drag) clearing the wg", END, "\n")
         self.parent().clear_dnd()
-        print("and now=", self.parent().src_dragwidget)
 
     def _on_drag_started(self):
         self.drag_started = True

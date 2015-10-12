@@ -11,7 +11,7 @@ import configparser
 import argparse
 from globalmenu import GlobalMenu
 
-# color
+# debug color
 # -----------
 RED = '\033[91m'
 GRE = '\033[92m'
@@ -84,6 +84,8 @@ class Window(QWidget):
 
     def on_parent_window(self):
         if self.isActiveWindow():
+            print("(fi: parent) normal path=", self.path) 
+            print("(fi: parent) modified path=", self.path.rsplit('/', 1)[0]) 
             path = self.path.rsplit('/', 1)[0]
             if self.window_exists(path):
                 return

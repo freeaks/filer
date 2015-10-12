@@ -5,7 +5,7 @@ from iconwidget import IconWidget
 import os
 import shutil
 
-# color
+# debug color
 # -----------
 RED = '\033[91m'
 GRE = '\033[92m'
@@ -33,6 +33,8 @@ class DragWidget(QWidget):
         self.rubberband = QRubberBand(QRubberBand.Rectangle, self)
         self.path = path
         self.icons = []
+        self.icon_offsetx = 0
+        self.icon_offsety = 0
         # self.clipicon = None
         # self.moving_icons = []
         for item in os.scandir(path):
@@ -62,52 +64,51 @@ class DragWidget(QWidget):
     def dragMoveEvent(self, event):
         event.accept()
 
-    def dropEvent(self, event):
-        event.accept()
-
+    def get_dnd_list(self, event):
         icon_list = []
-        
+        icon_offsetx = None
+        icon_offsety = None
         if len(DragWidget.src_selected) > 0:
-            print("equality here too=", GRE, self is DragWidget.src_dragwidget, END)
             for item in DragWidget.src_selected:
                 icon_list.append(item)
         else:
             icon_list.append(event.source())
+        return icon_list
 
+    def create_icon(self, name, drawer):
+        if drawer:
+            icon_widget = IconWidget(self, name=name, path=self.path, dir=True)
+        else: 
+            icon_widget = IconWidget(self, name=name, path=self.path, dir=False)
+        icon_widget.new_window.connect(self.new_window_signal.emit)
+        self.icons.append(icon_widget)
+
+    def place_icon(self, x, y):
+        self.icons[-1].move(x, y)
+        self.icons[-1].show()
+
+    def dropEvent(self, event):
+        event.accept()
+        icon_list = self.get_dnd_list(event)
+        icon_offsetx = event.pos().x()
+        icon_offsety = event.pos().y()
         for item in icon_list:
-
-            src_path = item.path
-            dst_path = self.path
-
+            name = item.name
+            drawer = item.drawer
+            src_path = item.path + "/" + name
+            dst_path = self.path + "/"
             if event.mimeData().hasFormat("application/x-icon"):
-                # name = event.source().name
-                # drawer = event.source().drawer
-                name = item.name
-                drawer = item.drawer
-                
-                print("loop item.name=[", RED, name, END, "]\n",
-                      "drawer=[", RED, drawer, END, "]\n",
-                      "src_path=[", RED, src_path + "/" + name, END, "]\n",
-                      "dst_path=[", RED, dst_path + "/", END, "]\n",
-                      "icon_list=[", RED, len(icon_list), END, "]\n",
-                      "---------------")
+                self.create_icon(name, drawer)
+                self.move_data(src_path, dst_path)
+                self.place_icon(icon_offsetx, icon_offsety)
+                icon_offsetx += 100 
+                if icon_offsetx > self.window().width():
+                    icon_offsetx = event.pos().x()
+                    icon_offsety += 75
 
-                if src_path is not dst_path:
-                    src_path += "/" + name
-                    dst_path += "/"
-                    # print("src=", src_path, "dst=", dst_path)
-                    # self.move_icon(src_path, dst_path)
-                if drawer:
-                    icon_widget = IconWidget(self, name=name, path=self.path, dir=True)
-                else: 
-                    icon_widget = IconWidget(self, name=name, path=self.path, dir=False)
-                icon_widget.new_window.connect(self.new_window_signal.emit)
-                self.icons.append(icon_widget)
-                self.icons[-1].move(event.pos().x(), event.pos().y())
-                self.icons[-1].show()
-        # self.remove_old()
-        # self.updateScrollArea()
-        # self.clean_up()
+        icon_offsetx = None
+        icon_offsety = None
+        self.updateScrollArea()
 
     def clear_dnd(self):
         DragWidget.src_dragwidget = None
@@ -133,20 +134,15 @@ class DragWidget(QWidget):
         # QWidget.mouseMoveEvent(self, event)
 
     def mouseReleaseEvent(self, event):
-        # print("len1=", len(self.icons))
-        DragWidget.src_selected.clear()
-        selected = []
+        self.clear_dnd()
         if self.rubberband.isVisible():
             self.rubberband.hide()
-            
             rect = self.rubberband.geometry()
             for child in self.findChildren(IconWidget):
                 if rect.intersects(child.geometry()):
-                    # selected.append(child)
                     child.icon.select_icon()
                     DragWidget.src_selected.append(child)
                     if DragWidget.src_dragwidget is not self:
-                        print("\n", GRE, "(dw: mouse release rubber) saving the wg", END, "\n")
                         DragWidget.src_dragwidget = self
 
     def mouseDoubleClickEvent(self, event):
@@ -154,8 +150,6 @@ class DragWidget(QWidget):
         self.query.emit()
 
     def clean_up(self):
-        # print("clean_up method")
-        # print("sw=", self.window().width())
         for item in self.icons:
             item.move(DragWidget.spacerX, DragWidget.spacerY)
             # initial icon placement
@@ -168,24 +162,22 @@ class DragWidget(QWidget):
         DragWidget.spacerY = 16
         self.updateScrollArea()
 
-    def move_icon(self, source, dest):
-        try:
-            shutil.move(source, dest)
-        except Exception as err:
-            print(err)
+    def move_data(self, source, dest):
+        if source is not dest:
+            try:
+                pass
+                # shutil.move(source, dest)
+            except Exception as err:
+                print(err)
 
     def copy_icon(self, source, dest):
         pass
 
     def delete_icon(self):
         dest = os.path.expanduser("~") + "/.Trash/"
-        # print(dest)
-        counter = 0
         for item in self.icons:
             if item.icon.selected:
                 source = item.path + "/" + item.name
-                # print("move=", source, "to=", dest)
-                # counter += 1
                 if source is not "":
                     try:
                         self.icons.remove(item)
@@ -193,7 +185,6 @@ class DragWidget(QWidget):
                         shutil.move(source, dest)
                     except Exception as err:
                         print(err)
-        # print("icons selected=", counter)
 
     def paste_icon(self):
         print("---")

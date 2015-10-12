@@ -46,7 +46,6 @@ class GlobalMenu(QWidget):
         delete_action.triggered.connect(self.delete_action)
         
         file_menu.addAction(requester_action)
-        # file_menu.addAction(open_drawer_action)
         file_menu.addAction(parent_action)
         file_menu.addAction(info_action)
         file_menu.addAction(about_action)
@@ -58,21 +57,20 @@ class GlobalMenu(QWidget):
         edit_menu.addAction(delete_action)
 
     def quit_action(self):
-        print("quiting")
+        print("quit action menu")
         sys.exit(0)
 
     def preferences_action(self):
-        print("calling prefs")
-        # subprocess.Popen("./prefs.py")
+        print("preference action menu")
         QProcess.startDetached("./prefs.py")
 
     def requester_action(self):
-        print("calling requester")
+        print("requester action menu")
         QProcess.startDetached("./requester.py")
 
     def parent_action(self):
+        print("parent action menu")
         self.new_window_signal.emit()
-        # print("wp=", Window.pa)
         
     def clean_action(self):
         print("clean up menu")
