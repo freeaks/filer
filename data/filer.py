@@ -36,7 +36,7 @@ class Window(QWidget):
         Window.menu.new_window_signal.connect(self.on_parent_window)
         Window.menu.clean_up_signal.connect(self.on_clean_up)
         Window.menu.delete_signal.connect(self.on_delete)
-        self.setWindowTitle(path)
+        self.setWindowTitle(path.rsplit('/', 1)[-1])
         Window.pattern = self.config.get("background", "file")
         self.path = path
         self.widget = QWidget()
@@ -84,9 +84,9 @@ class Window(QWidget):
 
     def on_parent_window(self):
         if self.isActiveWindow():
-            print("(fi: parent) normal path=", self.path) 
-            print("(fi: parent) modified path=", self.path.rsplit('/', 1)[0]) 
             path = self.path.rsplit('/', 1)[0]
+            if path is "":
+                path = "/"
             if self.window_exists(path):
                 return
             else:

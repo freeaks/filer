@@ -165,8 +165,7 @@ class DragWidget(QWidget):
     def move_data(self, source, dest):
         if source is not dest:
             try:
-                pass
-                # shutil.move(source, dest)
+                shutil.move(source, dest)
             except Exception as err:
                 print(err)
 
