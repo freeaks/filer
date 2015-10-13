@@ -7,6 +7,9 @@ import sys
 class GlobalMenu(QWidget):
 
     new_window_signal = pyqtSignal()
+    rename_signal = pyqtSignal()
+    file_signal = pyqtSignal()
+    drawer_signal = pyqtSignal()
     clean_up_signal = pyqtSignal()
     delete_signal = pyqtSignal()
 
@@ -18,10 +21,14 @@ class GlobalMenu(QWidget):
         
         about_action = QAction('About', self)
         preferences_action = QAction('Preferences', self)
+        preferences_action.setShortcut('Ctrl+Shift+P')
         quit_action = QAction('Quit', self)
+        quit_action.setShortcut('Ctrl+Q')
 
-        create_file_action = QAction('Create file', self)
-        create_drawer_action = QAction('Create drawer', self)
+        file_action = QAction('Create file', self)
+        file_action.setShortcut('Ctrl+Shift+N')
+        drawer_action = QAction('Create drawer', self)
+        drawer_action.setShortcut('Ctrl+N')
         requester_action = QAction('Requester', self)
         requester_action.setShortcut('Ctrl+O')
         parent_action = QAction('Open Parent', self)
@@ -29,6 +36,8 @@ class GlobalMenu(QWidget):
         info_action = QAction('Get info', self)
         info_action.setShortcut('Ctrl+I')
 
+        rename_action = QAction('Rename', self)
+        rename_action.setShortcut('Ctrl+R')
         copy_action = QAction('Copy', self)
         copy_action.setShortcut('Ctrl+C')
         paste_action = QAction('Paste', self)
@@ -42,6 +51,9 @@ class GlobalMenu(QWidget):
         quit_action.triggered.connect(self.quit_action)
         requester_action.triggered.connect(self.requester_action)
         parent_action.triggered.connect(self.parent_action)
+        file_action.triggered.connect(self.file_action)
+        drawer_action.triggered.connect(self.drawer_action)
+        rename_action.triggered.connect(self.rename_action)
         clean_action.triggered.connect(self.clean_action)
         delete_action.triggered.connect(self.delete_action)
         
@@ -51,6 +63,9 @@ class GlobalMenu(QWidget):
         file_menu.addAction(about_action)
         file_menu.addAction(quit_action)
         edit_menu.addAction(preferences_action)
+        edit_menu.addAction(file_action)
+        edit_menu.addAction(drawer_action)
+        edit_menu.addAction(rename_action)
         edit_menu.addAction(copy_action)
         edit_menu.addAction(paste_action)
         edit_menu.addAction(clean_action)
@@ -71,7 +86,19 @@ class GlobalMenu(QWidget):
     def parent_action(self):
         print("parent action menu")
         self.new_window_signal.emit()
-        
+
+    def file_action(self):
+        print("file action menu")
+        self.file_signal.emit()        
+
+    def drawer_action(self):
+        print("drawer action menu")
+        self.drawer_signal.emit()   
+
+    def rename_action(self):
+        print("rename action menu")
+        self.rename_signal.emit()
+
     def clean_action(self):
         print("clean up menu")
         self.clean_up_signal.emit()

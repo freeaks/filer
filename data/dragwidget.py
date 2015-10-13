@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QRect, QSize
-from PyQt5.QtWidgets import QWidget, QRubberBand
+from PyQt5.QtWidgets import QWidget, QRubberBand, QMessageBox
 # from PyQt5.QtGui import QRubberBand
-from iconwidget import IconWidget
+from iconwidget import IconWidget, ClickableIcon
 import os
 import shutil
 
@@ -37,7 +37,14 @@ class DragWidget(QWidget):
         self.icon_offsety = 0
         # self.clipicon = None
         # self.moving_icons = []
-        for item in os.scandir(path):
+        self.read_drawer()
+        self.clean_up()
+        # print(type(IconWidget.icon))
+        # print(self.findChildren(ClickableIcon))
+
+    def read_drawer(self):
+        # self.icons.clear()
+        for item in os.scandir(self.path):
             if item.is_dir():
                 icon_widget = IconWidget(parent=self, name=item.name, path=self.path, dir=True)
             else:
@@ -46,17 +53,18 @@ class DragWidget(QWidget):
             icon_widget.clipboard.connect(self.on_clipboard)
             self.icons.append(icon_widget)
             self.icons[-1].setAttribute(Qt.WA_DeleteOnClose)
-        self.clean_up()
+        # self.update()
 
     def updateScrollArea(self):
         """ set the dimension of the widget """
         iconx = []
         icony = []
-        for item in self.icons:
-            iconx.append(item.x())
-            icony.append(item.y())
-        self.setMinimumWidth(max(iconx)+75)
-        self.setMinimumHeight(max(icony)+75)
+        if len(self.icons) > 0:
+            for item in self.icons:
+                iconx.append(item.x())
+                icony.append(item.y())
+            self.setMinimumWidth(max(iconx)+75)
+            self.setMinimumHeight(max(icony)+75)
         
     def dragEnterEvent(self, event):
         event.accept()
@@ -149,6 +157,26 @@ class DragWidget(QWidget):
         print(BLU, "Double Click", END) 
         self.query.emit()
 
+    def create_file(self):
+        new_file = self.path + "/" + "newfile.txt"
+        open(new_file, 'w').close()
+        icon_widget = IconWidget(self, name="newfile.txt", path=self.path, dir=False)
+        icon_widget.new_window.connect(self.new_window_signal.emit)
+        icon_widget.show()
+        self.icons.append(icon_widget)
+
+    def create_drawer(self):
+        print("creating new drawer")
+        new_drawer = self.path + "/" + "NewDrawer"
+        os.makedirs(new_drawer)
+        icon_widget = IconWidget(self, name="NewDrawer", path=self.path, dir=True)
+        icon_widget.new_window.connect(self.new_window_signal.emit)
+        icon_widget.show()
+        self.icons.append(icon_widget)
+
+    def rename_file(self):
+        print("renaming file")
+
     def clean_up(self):
         for item in self.icons:
             item.move(DragWidget.spacerX, DragWidget.spacerY)
@@ -163,7 +191,9 @@ class DragWidget(QWidget):
         self.updateScrollArea()
 
     def move_data(self, source, dest):
-        if source is not dest:
+        srce_path = source.rsplit('/', 1)[0]
+        dest_path = dest.rsplit('/', 1)[0]
+        if srce_path != dest_path:
             try:
                 shutil.move(source, dest)
             except Exception as err:
@@ -174,16 +204,20 @@ class DragWidget(QWidget):
 
     def delete_icon(self):
         dest = os.path.expanduser("~") + "/.Trash/"
+        error_string = ""
         for item in self.icons:
             if item.icon.selected:
                 source = item.path + "/" + item.name
                 if source is not "":
                     try:
-                        self.icons.remove(item)
-                        item.deleteLater()
                         shutil.move(source, dest)
                     except Exception as err:
-                        print(err)
+                        error_string += str(err) + "\n" + "\n"
+                    else:
+                        self.icons.remove(item)
+                        item.deleteLater()
+        if error_string is not "":
+            QMessageBox.information(self, 'Message', error_string, QMessageBox.Ok)
 
     def paste_icon(self):
         print("---")

@@ -3,7 +3,7 @@
 from PyQt5.QtGui import QPalette, QBrush, QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import(
-    QApplication, QVBoxLayout, QScrollArea, QWidget)
+    QApplication, QVBoxLayout, QScrollArea, QWidget, QDesktopWidget)
 from dragwidget import DragWidget
 import sys
 import os
@@ -36,6 +36,9 @@ class Window(QWidget):
         Window.menu.new_window_signal.connect(self.on_parent_window)
         Window.menu.clean_up_signal.connect(self.on_clean_up)
         Window.menu.delete_signal.connect(self.on_delete)
+        Window.menu.rename_signal.connect(self.on_rename)
+        Window.menu.file_signal.connect(self.on_file)
+        Window.menu.drawer_signal.connect(self.on_drawer)
         self.setWindowTitle(path.rsplit('/', 1)[-1])
         Window.pattern = self.config.get("background", "file")
         self.path = path
@@ -61,7 +64,14 @@ class Window(QWidget):
         vlayout.addWidget(scroll)
         self.setLayout(vlayout)
         Window.child_windows.append(self)
+        self.center()
         self.show()
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def closeEvent(self, event):
         for item in Window.child_windows:
@@ -91,6 +101,24 @@ class Window(QWidget):
                 return
             else:
                 self.on_new_window(path)
+
+    def on_file(self):
+        if self.isActiveWindow():
+            print("create new file")
+            self._drag_widget.create_file()
+        pass
+
+    def on_drawer(self):
+        if self.isActiveWindow():
+            print("create new drawer")
+            self._drag_widget.create_drawer()
+        pass
+
+    def on_rename(self):
+        if self.isActiveWindow():
+            print("rename")
+            self._drag_widget.rename_file()
+        pass
 
     def on_clean_up(self):
         if self.isActiveWindow():

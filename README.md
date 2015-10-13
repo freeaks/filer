@@ -18,10 +18,13 @@ and there's almost no error checking yet.
 done:   
 ---
 - file requester: browse filesystem, open directory or execute file   
-- file manager: display files, reordering, dragndrop, copy, execute   
-		select, multiselect
-- preferences: choose pattern, font color   
-- global menu: open requester, parent, preferences, quit   
+- file manager:   display files, cleanup, dragndrop, copy, move,   
+		  execute, select, multiselect, trash, open parent,   
+		  create files and dirs, rename   
+- preferences:    choose pattern, font color   
+- global menu:    open file requester, preferences, quit, and    
+		  all file manager actions listed above.   
+		  
 
 
 todo:   
@@ -32,9 +35,7 @@ preferences:
 
 
 file manager:   
-- adding more file operations (copy, deleting, moving, renaming etc)   
-- implement some more menu items   
-- create a dopus5 like file lister   
+- create a dopus5-like file lister   
 - create icon info window   
-
+- create dialog to solve problem upon file operation (delete, overwrite, skip..)   
 
