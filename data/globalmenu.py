@@ -12,6 +12,7 @@ class GlobalMenu(QWidget):
     drawer_signal = pyqtSignal()
     clean_up_signal = pyqtSignal()
     delete_signal = pyqtSignal()
+    trash_action_signal = pyqtSignal()
 
     def __init__(self, parent=None):
         super(GlobalMenu, self).__init__(parent)
@@ -46,6 +47,8 @@ class GlobalMenu(QWidget):
         clean_action.setShortcut('Ctrl+;')
         delete_action = QAction('Move to Trash', self)
         delete_action.setShortcut('Ctrl+Backspace')
+        trash_action = QAction('Empty trash', self)
+        trash_action.setShortcut('Ctrl+Shift+Backspace')
 
         preferences_action.triggered.connect(self.preferences_action)
         quit_action.triggered.connect(self.quit_action)
@@ -56,6 +59,7 @@ class GlobalMenu(QWidget):
         rename_action.triggered.connect(self.rename_action)
         clean_action.triggered.connect(self.clean_action)
         delete_action.triggered.connect(self.delete_action)
+        trash_action.triggered.connect(self.trash_action)
         
         file_menu.addAction(requester_action)
         file_menu.addAction(parent_action)
@@ -70,6 +74,7 @@ class GlobalMenu(QWidget):
         edit_menu.addAction(paste_action)
         edit_menu.addAction(clean_action)
         edit_menu.addAction(delete_action)
+        edit_menu.addAction(trash_action)
 
     def quit_action(self):
         print("quit action menu")
@@ -106,3 +111,7 @@ class GlobalMenu(QWidget):
     def delete_action(self):
         print("delete action menu")
         self.delete_signal.emit()
+
+    def trash_action(self):
+        print("empty trash action menu")
+        self.empty_trash_action.signal.emit()

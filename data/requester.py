@@ -113,7 +113,6 @@ class ListItem (QWidget):
     def mouseDoubleClickEvent(self, event):
         if event.buttons() == Qt.LeftButton:
             if self.drawer:
-                print("dcncl=", self.current_path + self.name)
                 self.parent.create_list(current_path=self.current_path + self.name)
             else:
                 self.parent.file_field.set_text(name=self.name, path=self.current_path)

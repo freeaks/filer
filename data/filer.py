@@ -39,6 +39,7 @@ class Window(QWidget):
         Window.menu.rename_signal.connect(self.on_rename)
         Window.menu.file_signal.connect(self.on_file)
         Window.menu.drawer_signal.connect(self.on_drawer)
+        Window.menu.trash_action_signal.connect(self.on_empty_trash)
         self.setWindowTitle(path.rsplit('/', 1)[-1])
         Window.pattern = self.config.get("background", "file")
         self.path = path
@@ -126,7 +127,11 @@ class Window(QWidget):
 
     def on_delete(self):
         if self.isActiveWindow():
-            self._drag_widget.delete_icon()            
+            self._drag_widget.delete_icon()
+
+    def on_empty_trash(self):
+        print("emptying trash")
+        pass          
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Control:

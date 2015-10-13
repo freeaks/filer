@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal, QRect, QSize
 from PyQt5.QtWidgets import QWidget, QRubberBand, QMessageBox
 # from PyQt5.QtGui import QRubberBand
-from iconwidget import IconWidget, ClickableIcon
+from iconwidget import IconWidget
 import os
 import shutil
 
@@ -217,7 +217,7 @@ class DragWidget(QWidget):
                         self.icons.remove(item)
                         item.deleteLater()
         if error_string is not "":
-            QMessageBox.information(self, 'Message', error_string, QMessageBox.Ok)
+            QMessageBox.information(self, 'Info', error_string, QMessageBox.Ok)
 
     def paste_icon(self):
         print("---")
