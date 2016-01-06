@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+from PyQt5.QtCore import Qt, QSize, pyqtSignal
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import(
+    QApplication, QWidget, QLabel, QVBoxLayout, QAction, QToolBar, QMainWindow,
+    QHBoxLayout, QFormLayout, QListWidget, QListWidgetItem, 
+    QLineEdit)
+
+
+class requester(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.rzz = zagnut()
+        self.setCentralWidget(self.rzz)
+        Toolbar = QToolBar()
+        Toolbar.setIconSize(QSize(16, 16))
+        self.addToolBar(Toolbar)
+        
+        parent_action = QAction(QIcon('images/toolbar/up.png'), 'Parent', self)
+        home_action = QAction(QIcon('images/toolbar/home.png'), 'Home', self)
+        copy_action = QAction(QIcon('images/toolbar/copy.png'), 'Copy', self)
+        paste_action = QAction(QIcon('images/toolbar/paste.png'), 'Paste', self)
+        cut_action = QAction(QIcon('images/toolbar/cut.png'), 'Cut', self)
+        view_action = QAction(QIcon('images/toolbar/view.png'), 'View', self)
+        info_action = QAction(QIcon('images/toolbar/info.png'), 'Info', self)
+        setup_action = QAction(QIcon('images/toolbar/setup.png'), 'Setup', self)
+        trash_action = QAction(QIcon('images/toolbar/trash.png'), 'Trash', self)
+        # parent_action.setShortcut('Ctrl+Q')
+        parent_action.triggered.connect(self.open_parent)
+                
+        Toolbar.addAction((parent_action))
+        Toolbar.addAction((home_action))
+        Toolbar.addAction((copy_action))
+        Toolbar.addAction((paste_action))
+        Toolbar.addAction((cut_action))
+        Toolbar.addAction((view_action))
+        Toolbar.addAction((info_action))
+        Toolbar.addAction((setup_action))
+        Toolbar.addAction((trash_action))
+
+    def open_parent(self):
+        print(self.rzz.parent_path)
+        self.rzz.create_list(self.rzz.parent_path)
+
+
+class zagnut(QWidget):
+    def __init__(self):
+        super(zagnut, self).__init__()
+        self.setWindowTitle("/")
+        self.current_path = "/"
+        self.parent_path = "/"
+        self.main_Layout = QVBoxLayout()
+
+        self.button_layout = QHBoxLayout()
+        self.form_layout = QFormLayout()
+        self.form_layout.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
+        self.main_Layout.setContentsMargins(5, 5, 5, 5)
+        self.main_Layout.setSpacing(5)
+        self.myQListWidget = QListWidget(self)
+        self.myQListWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.myQListWidget.setStyleSheet("""
+            QListWidget:item:selected:active {
+            background-color:#A6A4FF;}
+            """)
+
+        self.file_field = file_field(parent=self)
+
+        self.form_layout.addRow(self.file_field)
+
+        self.main_Layout.addWidget(self.myQListWidget)
+        self.main_Layout.addLayout(self.form_layout)
+        self.main_Layout.addLayout(self.button_layout)
+        self.setLayout(self.main_Layout)
+        self.create_list(self.current_path)
+
+    def create_list(self, current_path):
+        self.myQListWidget.clear()
+        self.file_field.set_text(name=None, path=None)
+
+        # file browsing logic
+        # ----------------------
+        self.parent_path = current_path.rsplit('/', 1)[0]
+        if self.parent_path is "":
+            self.parent_path = "/"
+        if current_path is "/":
+            self.current_path = current_path
+            self.setWindowTitle(current_path)
+        else:
+            self.current_path = current_path + "/" 
+            self.setWindowTitle(current_path.rsplit('/', 1)[-1])
+        # -----------------------
+
+        files = sorted(os.scandir(current_path), key=lambda e: e.is_file())
+        for item in files:
+            if item.is_dir():
+                list_item = ListItem(name=item.name, drawer=True, current_path=self.current_path,
+                                     parent=self)
+            else:
+                list_item = ListItem(name=item.name, drawer=False, current_path=self.current_path,
+                                     parent=self)
+
+            myQListWidgetItem = QListWidgetItem(self.myQListWidget)
+            myQListWidgetItem.setSizeHint(list_item.sizeHint())
+            self.myQListWidget.addItem(myQListWidgetItem)
+            self.myQListWidget.setItemWidget(myQListWidgetItem, list_item)
+
+
+class ListItem (QWidget):
+
+    def __init__(self, name=None, drawer=None, current_path=None, parent=None):
+        super(ListItem, self).__init__(parent)
+        self.current_path = current_path
+        self.parent = parent
+        self.file_layout = QHBoxLayout()
+        self.file_layout.setContentsMargins(5, 5, 5, 0)
+        self.name_label = QLabel("")
+        self.size_label = QLabel("")
+        self.size_label.setAlignment(Qt.AlignRight)
+        self.file_layout.addWidget(self.name_label)
+        self.file_layout.addWidget(self.size_label)
+        self.file_layout.addSpacing(5)
+        self.setLayout(self.file_layout)
+        self.drawer = drawer
+        self.name = name
+        self.set_text(name)
+
+    def set_text(self, text):
+        if self.drawer:
+            self.setStyleSheet('''color: rgb(0, 0, 255);''')
+            self.size_label.setText("Drawer")
+        else:
+            self.setStyleSheet('''color: rgb(0, 0, 0);''')
+        self.name_label.setText(self.name)
+
+    def mouseDoubleClickEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            if self.drawer:
+                self.parent.create_list(current_path=self.current_path + self.name)
+            else:
+                self.parent.file_field.set_text(name=self.name, path=self.current_path)
+                
+
+class file_field(QLineEdit):
+
+    def __init__(self, parent=None):
+        super(file_field, self).__init__(parent)
+        self.parent = parent
+        # self.name = name
+        self.setPlaceholderText("Path")
+
+    def set_text(self, name=None, path=None):
+        self.path = path
+        self.name = name
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Return:
+            entry = self.text()
+            try:
+                if os.path.isdir(entry):
+                    self.parent.create_list(entry)
+            except Exception as reason:
+                print("error:", reason.args)
+        else:
+            super(file_field, self).keyPressEvent(event)
+
+if __name__ == '__main__':
+    app = QApplication([])
+    window = requester()
+    window.show()
+    sys.exit(app.exec_())
