@@ -2,7 +2,8 @@
 
 import sys
 import os
-from PyQt5.QtCore import Qt, QSize, pyqtSignal
+import shutil
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import(
     QApplication, QWidget, QLabel, QVBoxLayout, QAction, QToolBar, QMainWindow,
@@ -13,12 +14,13 @@ from PyQt5.QtWidgets import(
 class requester(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.rzz = zagnut()
-        self.setCentralWidget(self.rzz)
+        self.mywidget = central_widget()
+        self.setCentralWidget(self.mywidget)
+        
         Toolbar = QToolBar()
         Toolbar.setIconSize(QSize(16, 16))
         self.addToolBar(Toolbar)
-        
+
         parent_action = QAction(QIcon('images/toolbar/up.png'), 'Parent', self)
         home_action = QAction(QIcon('images/toolbar/home.png'), 'Home', self)
         copy_action = QAction(QIcon('images/toolbar/copy.png'), 'Copy', self)
@@ -30,7 +32,9 @@ class requester(QMainWindow):
         trash_action = QAction(QIcon('images/toolbar/trash.png'), 'Trash', self)
         # parent_action.setShortcut('Ctrl+Q')
         parent_action.triggered.connect(self.open_parent)
-                
+        home_action.triggered.connect(self.open_home)
+        copy_action.triggered.connect(self.copy_file)
+
         Toolbar.addAction((parent_action))
         Toolbar.addAction((home_action))
         Toolbar.addAction((copy_action))
@@ -42,29 +46,32 @@ class requester(QMainWindow):
         Toolbar.addAction((trash_action))
 
     def open_parent(self):
-        print(self.rzz.parent_path)
-        self.rzz.create_list(self.rzz.parent_path)
+        self.mywidget.create_list(self.mywidget.parent_path)
+
+    def open_home(self):
+        self.mywidget.create_list("/home")
+
+    def copy_file(self):
+        print("copying:")
 
 
-class zagnut(QWidget):
+class central_widget(QListWidget):
     def __init__(self):
-        super(zagnut, self).__init__()
+        super(central_widget, self).__init__()
         self.setWindowTitle("/")
         self.current_path = "/"
         self.parent_path = "/"
         self.main_Layout = QVBoxLayout()
-
-        self.button_layout = QHBoxLayout()
         self.form_layout = QFormLayout()
         self.form_layout.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         self.main_Layout.setContentsMargins(5, 5, 5, 5)
         self.main_Layout.setSpacing(5)
         self.myQListWidget = QListWidget(self)
         self.myQListWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.myQListWidget.setStyleSheet("""
-            QListWidget:item:selected:active {
-            background-color:#A6A4FF;}
-            """)
+        # self.myQListWidget.setStyleSheet("""
+        #     QListWidget:item:selected:active {
+        #     background-color:#A6A4FF;}
+        #     """)
 
         self.file_field = file_field(parent=self)
 
@@ -72,7 +79,6 @@ class zagnut(QWidget):
 
         self.main_Layout.addWidget(self.myQListWidget)
         self.main_Layout.addLayout(self.form_layout)
-        self.main_Layout.addLayout(self.button_layout)
         self.setLayout(self.main_Layout)
         self.create_list(self.current_path)
 
@@ -102,10 +108,17 @@ class zagnut(QWidget):
                 list_item = ListItem(name=item.name, drawer=False, current_path=self.current_path,
                                      parent=self)
 
-            myQListWidgetItem = QListWidgetItem(self.myQListWidget)
-            myQListWidgetItem.setSizeHint(list_item.sizeHint())
-            self.myQListWidget.addItem(myQListWidgetItem)
-            self.myQListWidget.setItemWidget(myQListWidgetItem, list_item)
+            self.myQListWidgetItem = QListWidgetItem(self.myQListWidget)
+            self.myQListWidgetItem.setSizeHint(list_item.sizeHint())
+            self.myQListWidget.addItem(self.myQListWidgetItem)
+            self.myQListWidget.setItemWidget(self.myQListWidgetItem, list_item)
+            
+    def mousePressEvent(self, event):
+        # print((myQListWidgetItem.item(3)))
+        print("aaa")
+
+    def myselect(self, list_item):
+        print("list_item=", (list_item.name))
 
 
 class ListItem (QWidget):
@@ -134,6 +147,11 @@ class ListItem (QWidget):
         else:
             self.setStyleSheet('''color: rgb(0, 0, 0);''')
         self.name_label.setText(self.name)
+
+    def mousePressEvent(self, event):
+        # self.setStyleSheet("""background-color:#A6A4FF;""")
+        print("name=", self.name)
+        self.parent.myselect(self)
 
     def mouseDoubleClickEvent(self, event):
         if event.buttons() == Qt.LeftButton:
