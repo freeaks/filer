@@ -8,8 +8,10 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import(
     QApplication, QWidget, QLabel, QVBoxLayout, QAction, QToolBar, QMainWindow,
     QHBoxLayout, QFormLayout, QListWidget, QListWidgetItem, 
-    QLineEdit)
+    QLineEdit, QAbstractItemView, QSizePolicy)
 
+from inspect import getmembers
+from pprint import pprint
 
 class requester(QMainWindow):
     def __init__(self):
@@ -68,6 +70,7 @@ class central_widget(QListWidget):
         self.main_Layout.setSpacing(5)
         self.myQListWidget = QListWidget(self)
         self.myQListWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.myQListWidget.setSelectionMode(QAbstractItemView.MultiSelection)
         # self.myQListWidget.setStyleSheet("""
         #     QListWidget:item:selected:active {
         #     background-color:#A6A4FF;}
@@ -81,6 +84,7 @@ class central_widget(QListWidget):
         self.main_Layout.addLayout(self.form_layout)
         self.setLayout(self.main_Layout)
         self.create_list(self.current_path)
+        # self.pp = pprint.PrettyPrinter(indent=4)
 
     def create_list(self, current_path):
         self.myQListWidget.clear()
@@ -100,6 +104,8 @@ class central_widget(QListWidget):
         # -----------------------
 
         files = sorted(os.scandir(current_path), key=lambda e: e.is_file())
+        self.items = []
+        print("size of items=", len(self.items))
         for item in files:
             if item.is_dir():
                 list_item = ListItem(name=item.name, drawer=True, current_path=self.current_path,
@@ -112,13 +118,17 @@ class central_widget(QListWidget):
             self.myQListWidgetItem.setSizeHint(list_item.sizeHint())
             self.myQListWidget.addItem(self.myQListWidgetItem)
             self.myQListWidget.setItemWidget(self.myQListWidgetItem, list_item)
-            
-    def mousePressEvent(self, event):
-        # print((myQListWidgetItem.item(3)))
-        print("aaa")
+            self.items.append(self.myQListWidgetItem)
 
     def myselect(self, list_item):
-        print("list_item=", (list_item.name))
+        print("ii", self.myQListWidget.itemWidget(self.items[0]).xyz())
+        self.items[0].setSelected(True)
+        # self.items[1].setSelected(True)
+        print("sel=", self.items[0].isSelected())
+        # print(self.myQListWidget.itemWidget(self.myQListWidgetItem).xyz())
+        # items = []
+        # for index in range(self.myQListWidget.count()):
+        #     items.append(self.myQListWidget.item(index))
 
 
 class ListItem (QWidget):
@@ -131,6 +141,7 @@ class ListItem (QWidget):
         self.file_layout.setContentsMargins(5, 5, 5, 0)
         self.name_label = QLabel("")
         self.size_label = QLabel("")
+        self.name_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.size_label.setAlignment(Qt.AlignRight)
         self.file_layout.addWidget(self.name_label)
         self.file_layout.addWidget(self.size_label)
@@ -150,7 +161,7 @@ class ListItem (QWidget):
 
     def mousePressEvent(self, event):
         # self.setStyleSheet("""background-color:#A6A4FF;""")
-        print("name=", self.name)
+        # print("name=", self.name)
         self.parent.myselect(self)
 
     def mouseDoubleClickEvent(self, event):
@@ -159,6 +170,9 @@ class ListItem (QWidget):
                 self.parent.create_list(current_path=self.current_path + self.name)
             else:
                 self.parent.file_field.set_text(name=self.name, path=self.current_path)
+    
+    def xyz(self):
+        return self.name
                 
 
 class file_field(QLineEdit):
