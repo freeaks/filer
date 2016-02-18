@@ -3,6 +3,7 @@
 import sys
 import os
 import shutil
+import subprocess
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import(
@@ -34,6 +35,7 @@ class requester(QMainWindow):
         parent_action.triggered.connect(self.open_parent)
         home_action.triggered.connect(self.open_home)
         copy_action.triggered.connect(self.copy_file)
+        info_action.triggered.connect(self.get_dir_size)
 
         Toolbar.addAction((parent_action))
         Toolbar.addAction((home_action))
@@ -53,6 +55,9 @@ class requester(QMainWindow):
 
     def copy_file(self):
         print("copying:")
+
+    def get_dir_size(self):
+        self.mywidget.get_dir_size()
 
 
 class central_widget(QWidget):
@@ -112,11 +117,22 @@ class central_widget(QWidget):
             self.myQListWidget.setItemWidget(self.myQListWidgetItem, list_item)
             self.items.append(self.myQListWidgetItem)
 
-    def mousePressEvent(self, event):
+    # def mousePressEvent(self, event):
+    #     self.get_dir_size()
+        # for element in self.items:
+        #     if element.isSelected():
+        #         print("selected element=", self.myQListWidget.itemWidget(element).xyz())
+        # print("-------\n")
+
+    def get_dir_size(self): 
+        sitems = []
         for element in self.items:
             if element.isSelected():
-                print("element=", self.myQListWidget.itemWidget(element).xyz())
-        print("-------\n")
+                sitems = self.myQListWidget.itemWidget(element)
+                dir_size = subprocess.check_output(["du", "-sh", self.current_path + sitems.xyz()])
+                dir_str = dir_size.decode("utf-8")
+                dir_str = dir_str.split('\t')[0]
+                sitems.set_text(sitems.xyz(), dir_str)
 
 
 class ListItem (QWidget):
@@ -138,10 +154,10 @@ class ListItem (QWidget):
         self.name = name
         self.set_text(name)
 
-    def set_text(self, text):
+    def set_text(self, text, text2="Drawer"):
         if self.drawer:
             self.setStyleSheet('''color: rgb(0, 0, 255);''')
-            self.size_label.setText("Drawer")
+            self.size_label.setText(text2)
         else:
             self.setStyleSheet('''color: rgb(0, 0, 0);''')
             filesize = os.path.getsize(self.current_path + self.name)
