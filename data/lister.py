@@ -10,8 +10,6 @@ from PyQt5.QtWidgets import(
     QHBoxLayout, QFormLayout, QListWidget, QListWidgetItem, 
     QLineEdit, QAbstractItemView, QSizePolicy)
 
-from inspect import getmembers
-from pprint import pprint
 
 class requester(QMainWindow):
     def __init__(self):
@@ -57,7 +55,7 @@ class requester(QMainWindow):
         print("copying:")
 
 
-class central_widget(QListWidget):
+class central_widget(QWidget):
     def __init__(self):
         super(central_widget, self).__init__()
         self.setWindowTitle("/")
@@ -71,10 +69,6 @@ class central_widget(QListWidget):
         self.myQListWidget = QListWidget(self)
         self.myQListWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.myQListWidget.setSelectionMode(QAbstractItemView.MultiSelection)
-        # self.myQListWidget.setStyleSheet("""
-        #     QListWidget:item:selected:active {
-        #     background-color:#A6A4FF;}
-        #     """)
 
         self.file_field = file_field(parent=self)
 
@@ -84,7 +78,6 @@ class central_widget(QListWidget):
         self.main_Layout.addLayout(self.form_layout)
         self.setLayout(self.main_Layout)
         self.create_list(self.current_path)
-        # self.pp = pprint.PrettyPrinter(indent=4)
 
     def create_list(self, current_path):
         self.myQListWidget.clear()
@@ -116,19 +109,24 @@ class central_widget(QListWidget):
 
             self.myQListWidgetItem = QListWidgetItem(self.myQListWidget)
             self.myQListWidgetItem.setSizeHint(list_item.sizeHint())
-            self.myQListWidget.addItem(self.myQListWidgetItem)
+            # self.myQListWidget.addItem(self.myQListWidgetItem)
             self.myQListWidget.setItemWidget(self.myQListWidgetItem, list_item)
             self.items.append(self.myQListWidgetItem)
 
-    def myselect(self, list_item):
-        print("ii", self.myQListWidget.itemWidget(self.items[0]).xyz())
-        self.items[0].setSelected(True)
-        # self.items[1].setSelected(True)
-        print("sel=", self.items[0].isSelected())
-        # print(self.myQListWidget.itemWidget(self.myQListWidgetItem).xyz())
-        # items = []
-        # for index in range(self.myQListWidget.count()):
-        #     items.append(self.myQListWidget.item(index))
+    def mousePressEvent(self, event):
+        for element in self.items:
+            if element.isSelected():
+                print("element=", self.myQListWidget.itemWidget(element).xyz())
+        print("-------\n")
+    # def myselect(self, list_item):
+    #     for element in self.items:
+    #         if element.isSelected():
+    #             print("element=", self.myQListWidget.itemWidget(element).xyz())
+    #         if list_item.xyz() == self.myQListWidget.itemWidget(element).xyz():
+    #             if element.isSelected():
+    #                 element.setSelected(False)
+    #             else:
+    #                 element.setSelected(True)
 
 
 class ListItem (QWidget):
@@ -159,10 +157,11 @@ class ListItem (QWidget):
             self.setStyleSheet('''color: rgb(0, 0, 0);''')
         self.name_label.setText(self.name)
 
-    def mousePressEvent(self, event):
-        # self.setStyleSheet("""background-color:#A6A4FF;""")
-        # print("name=", self.name)
-        self.parent.myselect(self)
+    # def mousePressEvent(self, event):
+    #     # self.setStyleSheet("""background-color:#A6A4FF;""")
+    #     # print("name=", self.name)
+    #     self.parent.myselect(self)
+    #     # super(ListItem, self).mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event):
         if event.buttons() == Qt.LeftButton:
