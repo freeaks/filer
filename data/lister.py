@@ -109,7 +109,6 @@ class central_widget(QWidget):
 
             self.myQListWidgetItem = QListWidgetItem(self.myQListWidget)
             self.myQListWidgetItem.setSizeHint(list_item.sizeHint())
-            # self.myQListWidget.addItem(self.myQListWidgetItem)
             self.myQListWidget.setItemWidget(self.myQListWidgetItem, list_item)
             self.items.append(self.myQListWidgetItem)
 
@@ -118,19 +117,9 @@ class central_widget(QWidget):
             if element.isSelected():
                 print("element=", self.myQListWidget.itemWidget(element).xyz())
         print("-------\n")
-    # def myselect(self, list_item):
-    #     for element in self.items:
-    #         if element.isSelected():
-    #             print("element=", self.myQListWidget.itemWidget(element).xyz())
-    #         if list_item.xyz() == self.myQListWidget.itemWidget(element).xyz():
-    #             if element.isSelected():
-    #                 element.setSelected(False)
-    #             else:
-    #                 element.setSelected(True)
 
 
 class ListItem (QWidget):
-
     def __init__(self, name=None, drawer=None, current_path=None, parent=None):
         super(ListItem, self).__init__(parent)
         self.current_path = current_path
@@ -155,13 +144,9 @@ class ListItem (QWidget):
             self.size_label.setText("Drawer")
         else:
             self.setStyleSheet('''color: rgb(0, 0, 0);''')
+            filesize = os.path.getsize(self.current_path + self.name)
+            self.size_label.setText(self.GetHumanReadable(filesize))
         self.name_label.setText(self.name)
-
-    # def mousePressEvent(self, event):
-    #     # self.setStyleSheet("""background-color:#A6A4FF;""")
-    #     # print("name=", self.name)
-    #     self.parent.myselect(self)
-    #     # super(ListItem, self).mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event):
         if event.buttons() == Qt.LeftButton:
@@ -172,6 +157,14 @@ class ListItem (QWidget):
     
     def xyz(self):
         return self.name
+
+    def GetHumanReadable(self, size, precision=2):
+        suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
+        suffixIndex = 0
+        while size > 1024 and suffixIndex < 4:
+            suffixIndex += 1  # increment the index of the suffix
+            size = size/1024.0  # apply the division
+        return "%.*f%s" % (precision, size, suffixes[suffixIndex])
                 
 
 class file_field(QLineEdit):
