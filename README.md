@@ -6,6 +6,7 @@ with heavy influences from the Amiga Workbench and Directory Opus 5
 file manager: [filer.py](https://raw.github.com/freeaks/filer/master/test-tree/screenshots/filer.png) <-- click for screenshot   
 preference program: [prefs.py](https://raw.github.com/freeaks/filer/master/test-tree/screenshots/prefs.png)   
 asl requester program: [requester.py](https://raw.github.com/freeaks/filer/master/test-tree/screenshots/asl_req.png)   
+lister program: [lister.py](https://raw.github.com/freeaks/filer/master/test-tree/screenshots/lister.png)
 
 
 status:   

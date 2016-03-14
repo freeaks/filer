@@ -100,10 +100,10 @@ class central_widget(QWidget):
             self.current_path = current_path + "/" 
             self.setWindowTitle(current_path.rsplit('/', 1)[-1])
         # -----------------------
-
+        
         files = sorted(os.scandir(current_path), key=lambda e: e.is_file())
         self.items = []
-        print("size of items=", len(self.items))
+        print("size of global 'items' =", len(self.items), "(resetted)")
         for item in files:
             if item.is_dir():
                 list_item = ListItem(name=item.name, drawer=True, current_path=self.current_path,
@@ -116,13 +116,7 @@ class central_widget(QWidget):
             self.myQListWidgetItem.setSizeHint(list_item.sizeHint())
             self.myQListWidget.setItemWidget(self.myQListWidgetItem, list_item)
             self.items.append(self.myQListWidgetItem)
-
-    # def mousePressEvent(self, event):
-    #     self.get_dir_size()
-        # for element in self.items:
-        #     if element.isSelected():
-        #         print("selected element=", self.myQListWidget.itemWidget(element).xyz())
-        # print("-------\n")
+        print("size of global 'items' =", len(self.items))
 
     def get_dir_size(self): 
         sitems = []
@@ -162,6 +156,7 @@ class ListItem (QWidget):
             self.setStyleSheet('''color: rgb(0, 0, 0);''')
             filesize = os.path.getsize(self.current_path + self.name)
             self.size_label.setText(self.GetHumanReadable(filesize))
+            # self.size_label.setText("file")
         self.name_label.setText(self.name)
 
     def mouseDoubleClickEvent(self, event):
