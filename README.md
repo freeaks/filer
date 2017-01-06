@@ -11,9 +11,9 @@ features so far:
 - move
 - prefs
 
-![Alt text](https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/prefs.png?raw=true)
-![Alt text](https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/lister.png?raw=true)
-![Alt text](https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/asl_req.png.png?raw=true)
-![Alt text](https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/filer.png?raw=true)
+<img src=https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/prefs.png?raw=true width=120>
+<img src=https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/lister.png?raw=true width=120>
+<img src=https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/asl_req.png.png?raw=true width=120>
+<img src=https://github.com/nsklaus/filer/blob/master/test-tree/screenshots/filer.png?raw=true width=120>
 
 
