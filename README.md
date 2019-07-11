@@ -2,7 +2,7 @@ filer:
 ---   
 a file manager in pyqt, for linux or osx,   
 with heavy influences from the Amiga Workbench and Directory Opus 5  
-status: tech demo, abandonned
+status: tech demo, abandoned
   
 features so far:
 - delete
